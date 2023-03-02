@@ -12,7 +12,6 @@ public class LocalStartup : Startup
 {
     protected override IServiceCollection RegisterServices(IServiceCollection services) => base.RegisterServices(services)
         .AddSingleton<Partitions, MemoryPartitions>()
-        .AddSingleton<ItemSerializer, JsonItemSerializer>()
         .AddSingleton<User, MemoryUser>()
         .AddSingleton<MemoryUsers>()
         .AddSingleton<Identity, AuthorizationHeaderIdentity>();

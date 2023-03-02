@@ -6,13 +6,19 @@
     <AWSProjectType>Lambda</AWSProjectType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.3.100.1" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.4" />
     <PackageReference Include="Amazon.Lambda.AspNetCoreServer" Version="5.1.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Authentication.ASP\Authentication.ASP.csproj" />
     <ProjectReference Include="..\Server\Server.csproj" />
+    <ProjectReference Include="..\Users.Cognito\Users.Cognito.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+    
+   <ItemGroup>
+    <PackageReference Include="Staticsoft.PartitionedStorage.AWS" Version="1.0.0-5" />
   </ItemGroup>
 </Project>

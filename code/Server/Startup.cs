@@ -1,5 +1,5 @@
 using Staticsoft.Contracts.ASP.Server;
-using Staticsoft.HttpCommunication.Json;
+using Staticsoft.PartitionedStorage.Abstractions;
 using Staticsoft.Serialization.Net;
 using System.Reflection;
 
@@ -18,10 +18,10 @@ public abstract class Startup
         .UseServerAPIRouting<Schema>();
 
     protected virtual IServiceCollection RegisterServices(IServiceCollection services) => services
+        .AddCors()
         .UseServerAPI<Schema>(Assembly.GetExecutingAssembly())
         .AddHttpContextAccessor()
-        .AddCors()
         .UseSystemJsonSerializer()
-        .UseJsonHttpCommunication()
+        .AddSingleton<ItemSerializer, JsonItemSerializer>()
         .AddSingleton<Documents>();
 }

@@ -1,5 +1,4 @@
 ﻿using Staticsoft.SharpPass.Users;
-using System.Threading.Tasks;
 
 namespace Staticsoft.SharpPass.Server;
 
