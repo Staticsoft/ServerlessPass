@@ -1,3 +1,3 @@
 ﻿namespace Staticsoft.SharpPass.Contracts;
 
-public class UpdatePasswordRequest : Password { }
+public class UpdatePasswordRequest : PasswordProfile { }

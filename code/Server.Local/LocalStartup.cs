@@ -15,5 +15,5 @@ public class LocalStartup : Startup
         .AddSingleton<ItemSerializer, JsonItemSerializer>()
         .AddSingleton<User, MemoryUser>()
         .AddSingleton<MemoryUsers>()
-        .AddSingleton<Identity, AuthenticationHeaderIdentity>();
+        .AddSingleton<Identity, AuthorizationHeaderIdentity>();
 }

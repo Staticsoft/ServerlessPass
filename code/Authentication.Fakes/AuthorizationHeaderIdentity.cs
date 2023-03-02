@@ -2,15 +2,15 @@
 
 namespace Staticsoft.SharpPass.Authentication.Fakes;
 
-public class AuthenticationHeaderIdentity : Identity
+public class AuthorizationHeaderIdentity : Identity
 {
     readonly IHttpContextAccessor Accessor;
 
-    public AuthenticationHeaderIdentity(IHttpContextAccessor accessor)
+    public AuthorizationHeaderIdentity(IHttpContextAccessor accessor)
         => Accessor = accessor;
 
     public string UserId
-        => Context.Request.Headers["Authentication"].Single().Replace("JWT ", string.Empty);
+        => Context.Request.Headers["Authorization"].Single().Replace("JWT ", string.Empty);
 
     HttpContext Context
         => Accessor.HttpContext ?? throw UnexpectedNullException(nameof(Context));

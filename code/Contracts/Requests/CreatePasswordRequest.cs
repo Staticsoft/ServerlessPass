@@ -1,3 +1,3 @@
 ﻿namespace Staticsoft.SharpPass.Contracts;
 
-public class CreatePasswordRequest : Password { }
+public class CreatePasswordRequest : PasswordProfile { }

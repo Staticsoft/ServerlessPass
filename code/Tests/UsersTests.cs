@@ -1,26 +1,16 @@
 ﻿using Staticsoft.SharpPass.Users;
-using Staticsoft.SharpPass.Users.Fakes;
 
 namespace Staticsoft.SharpPass.Tests;
 
-public class UsersTests : TestBase, IAsyncLifetime
+public class UsersTests : ScenarioBase
 {
-    readonly string UserEmail;
-    const string UserPassword = "TestP@ssword!123";
-
-    MemoryUser Users
-        => (MemoryUser)Get<User>();
-
-    public UsersTests()
-        => UserEmail = $"test-{Guid.NewGuid()}@email.com";
-
     [Fact]
     public async Task CannotAuthenticateUsingInvalidEmail()
     {
         await Assert.ThrowsAsync<LogInException>(() => API.Auth.Jwt.Create.Execute(new()
         {
             Email = "invalid@email.com",
-            Password = UserPassword
+            Password = User.Password
         }));
     }
 
@@ -29,7 +19,7 @@ public class UsersTests : TestBase, IAsyncLifetime
     {
         await Assert.ThrowsAsync<LogInException>(() => API.Auth.Jwt.Create.Execute(new()
         {
-            Email = UserEmail,
+            Email = User.Email,
             Password = "InvalidPassword"
         }));
     }
@@ -39,8 +29,8 @@ public class UsersTests : TestBase, IAsyncLifetime
     {
         var response = await API.Auth.Jwt.Create.Execute(new()
         {
-            Email = UserEmail,
-            Password = UserPassword
+            Email = User.Email,
+            Password = User.Password
         });
         Assert.NotEmpty(response.Access);
         Assert.NotEmpty(response.Refresh);
@@ -60,8 +50,8 @@ public class UsersTests : TestBase, IAsyncLifetime
     {
         var initialResponse = await API.Auth.Jwt.Create.Execute(new()
         {
-            Email = UserEmail,
-            Password = UserPassword
+            Email = User.Email,
+            Password = User.Password
         });
         var secondaryResponse = await API.Auth.Jwt.Refresh.Execute(new()
         {
@@ -70,10 +60,4 @@ public class UsersTests : TestBase, IAsyncLifetime
         Assert.NotEmpty(secondaryResponse.Access);
         Assert.NotEmpty(secondaryResponse.Refresh);
     }
-
-    public Task InitializeAsync()
-        => Users.Create(UserEmail, UserPassword);
-
-    public Task DisposeAsync()
-        => Task.CompletedTask;
 }

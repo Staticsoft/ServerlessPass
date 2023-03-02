@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 using Staticsoft.Contracts.ASP.Server;
 using Staticsoft.HttpCommunication.Json;
 using Staticsoft.Serialization.Net;
@@ -25,5 +22,6 @@ public abstract class Startup
         .AddHttpContextAccessor()
         .AddCors()
         .UseSystemJsonSerializer()
-        .UseJsonHttpCommunication();
+        .UseJsonHttpCommunication()
+        .AddSingleton<Documents>();
 }

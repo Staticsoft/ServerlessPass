@@ -1,6 +1,6 @@
 ﻿namespace Staticsoft.SharpPass.Contracts;
 
-public class Password
+public class PasswordProfile
 {
     public string Id { get; init; } = string.Empty;
     public string Login { get; init; } = string.Empty;

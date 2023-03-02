@@ -6,14 +6,14 @@ namespace Staticsoft.SharpPass.Contracts;
 public class Passwords
 {
     public Passwords(
-        ParametrizedHttpEndpoint<UpdatePasswordRequest, Password> update,
+        ParametrizedHttpEndpoint<UpdatePasswordRequest, PasswordProfile> update,
         ParametrizedHttpEndpoint<EmptyRequest, DeletePasswordResponse> delete
     )
         => (Update, Delete)
         = (update, delete);
 
     [Endpoint(HttpMethod.Put)]
-    public ParametrizedHttpEndpoint<UpdatePasswordRequest, Password> Update { get; }
+    public ParametrizedHttpEndpoint<UpdatePasswordRequest, PasswordProfile> Update { get; }
 
     [Endpoint(HttpMethod.Delete)]
     [EndpointBehavior(statusCode: 204)]

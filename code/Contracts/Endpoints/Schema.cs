@@ -8,8 +8,8 @@ public class Schema
     public Schema(
         Auth auth,
         Passwords passwords,
-        HttpEndpoint<EmptyRequest, Password[]> listPasswords,
-        HttpEndpoint<CreatePasswordRequest, Password> createPassword
+        HttpEndpoint<EmptyRequest, PasswordProfiles> listPasswords,
+        HttpEndpoint<CreatePasswordRequest, PasswordProfile> createPassword
     )
         => (Auth, Passwords, ListPasswords, CreatePassword)
         = (auth, passwords, listPasswords, createPassword);
@@ -18,8 +18,8 @@ public class Schema
     public Passwords Passwords { get; }
 
     [Endpoint(HttpMethod.Get, pattern: nameof(Passwords))]
-    public HttpEndpoint<EmptyRequest, Password[]> ListPasswords { get; }
+    public HttpEndpoint<EmptyRequest, PasswordProfiles> ListPasswords { get; }
 
     [Endpoint(HttpMethod.Post, pattern: nameof(Passwords))]
-    public HttpEndpoint<CreatePasswordRequest, Password> CreatePassword { get; }
+    public HttpEndpoint<CreatePasswordRequest, PasswordProfile> CreatePassword { get; }
 }
