@@ -1,32 +1,29 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Staticsoft.Contracts.ASP.Server;
+using Staticsoft.HttpCommunication.Json;
+using Staticsoft.Serialization.Net;
+using System.Reflection;
 
 namespace Staticsoft.SharpPass.Server;
 
 public abstract class Startup
 {
     public void ConfigureServices(IServiceCollection services)
-    {
-        services.AddControllers();
-        services.AddCors();
-        RegisterServices(services);
-    }
+        => RegisterServices(services);
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-    {
-        ConfigureApp(app, env);
+        => ConfigureApp(app, env);
 
-        app.UseRouting();
+    protected virtual IApplicationBuilder ConfigureApp(IApplicationBuilder app, IWebHostEnvironment env) => app
+        .UseRouting()
+        .UseServerAPIRouting<Schema>();
 
-        app.UseEndpoints(ConfigureEndpoints);
-    }
-
-    protected virtual void ConfigureApp(IApplicationBuilder app, IWebHostEnvironment env) { }
-    protected virtual IServiceCollection RegisterServices(IServiceCollection services)
-        => services;
-
-    void ConfigureEndpoints(IEndpointRouteBuilder endpoints)
-        => endpoints.MapControllers();
+    protected virtual IServiceCollection RegisterServices(IServiceCollection services) => services
+        .UseServerAPI<Schema>(Assembly.GetExecutingAssembly())
+        .AddHttpContextAccessor()
+        .AddCors()
+        .UseSystemJsonSerializer()
+        .UseJsonHttpCommunication();
 }

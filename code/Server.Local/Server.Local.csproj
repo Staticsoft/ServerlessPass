@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Authentication.Fakes\Authentication.Fakes.csproj" />
     <ProjectReference Include="..\Server\Server.csproj" />
+    <ProjectReference Include="..\Users.Fakes\Users.Fakes.csproj" />
+  </ItemGroup>
+    
+  <ItemGroup>
+    <PackageReference Include="Staticsoft.PartitionedStorage.Memory" Version="1.0.0-5" />
   </ItemGroup>
 </Project>

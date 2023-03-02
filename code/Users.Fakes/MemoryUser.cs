@@ -2,7 +2,10 @@
 
 public class MemoryUser : User
 {
-    readonly HashSet<int> Users = new();
+    readonly MemoryUsers Users;
+
+    public MemoryUser(MemoryUsers users)
+        => Users = users;
 
     public Task Create(string username, string password)
     {

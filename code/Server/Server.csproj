@@ -6,17 +6,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Staticsoft.Contracts.ASP.Server" Version="1.0.0-10" />
     <PackageReference Include="Staticsoft.PartitionedStorage.Abstractions" Version="1.0.0-5" />
+    <PackageReference Include="Staticsoft.HttpCommunication.Json" Version="1.0.0-6" />
+    <PackageReference Include="Staticsoft.Serialization.Net" Version="1.0.0-6" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Authentication\Authentication.csproj" />
+    <ProjectReference Include="..\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\Users\Users.csproj" />
   </ItemGroup>
 

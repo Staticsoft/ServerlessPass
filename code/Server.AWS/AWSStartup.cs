@@ -5,16 +5,11 @@ namespace Staticsoft.SharpPass.Server.AWS;
 
 public class AWSStartup : Startup
 {
-    protected override void ConfigureApp(IApplicationBuilder app, IWebHostEnvironment env)
-    {
-        app.UseHttpsRedirection();
-
-        app.UseAuthorization();
-
-        app.UseCors(policy => policy
+    protected override IApplicationBuilder ConfigureApp(IApplicationBuilder app, IWebHostEnvironment env) => base.ConfigureApp(app, env)
+        .UseAuthorization()
+        .UseCors(policy => policy
             .AllowAnyOrigin()
             .AllowAnyMethod()
             .AllowAnyHeader()
         );
-    }
 }
