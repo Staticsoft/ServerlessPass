@@ -8,7 +8,7 @@ public class Schema
     public Schema(
         Auth auth,
         Passwords passwords,
-        HttpEndpoint<EmptyRequest, PasswordProfiles> listPasswords,
+        HttpEndpoint<EmptyRequest, PasswordProfilesResponse> listPasswords,
         HttpEndpoint<CreatePasswordRequest, PasswordProfile> createPassword
     )
         => (Auth, Passwords, ListPasswords, CreatePassword)
@@ -18,7 +18,7 @@ public class Schema
     public Passwords Passwords { get; }
 
     [Endpoint(HttpMethod.Get, pattern: nameof(Passwords))]
-    public HttpEndpoint<EmptyRequest, PasswordProfiles> ListPasswords { get; }
+    public HttpEndpoint<EmptyRequest, PasswordProfilesResponse> ListPasswords { get; }
 
     [Endpoint(HttpMethod.Post, pattern: nameof(Passwords))]
     public HttpEndpoint<CreatePasswordRequest, PasswordProfile> CreatePassword { get; }

@@ -2,7 +2,7 @@
 
 namespace Staticsoft.SharpPass.Contracts;
 
-public class PasswordProfiles
+public class PasswordProfilesResponse
 {
     public PasswordProfile[] Results { get; init; } = Array.Empty<PasswordProfile>();
 
