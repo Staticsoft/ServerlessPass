@@ -25,5 +25,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Server.Local\Server.Local.csproj" />
   </ItemGroup>
+    
+  <ItemGroup>
+    <PackageReference Include="Staticsoft.Contracts.ASP.Client" Version="1.0.0-10" />
+    <PackageReference Include="Staticsoft.Testing.Integration" Version="1.0.0-6" />
+  </ItemGroup>
 
 </Project>

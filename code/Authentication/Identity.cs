@@ -1,9 +1,6 @@
 ﻿namespace Staticsoft.SharpPass.Authentication;
 
-public class Identity
+public interface Identity
 {
-    public readonly string UserId;
-
-    public Identity(string userId)
-        => UserId = userId;
+    string UserId { get; }
 }

@@ -11,6 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Staticsoft.Contracts.ASP.Server" Version="1.0.0-10" />
+    <PackageReference Include="Staticsoft.PartitionedStorage.Abstractions" Version="1.0.0-5" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Authentication\Authentication.csproj" />
     <ProjectReference Include="..\Users\Users.csproj" />
   </ItemGroup>
