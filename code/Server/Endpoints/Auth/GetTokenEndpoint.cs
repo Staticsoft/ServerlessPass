@@ -1,12 +1,10 @@
-﻿using Staticsoft.SharpPass.Users;
-
-namespace Staticsoft.SharpPass.Server;
+﻿namespace Staticsoft.SharpPass.Server;
 
 public class GetTokenEndpoint : HttpEndpoint<CreateJwtRequest, JwtResponse>
 {
-    readonly User User;
+    readonly Users.User User;
 
-    public GetTokenEndpoint(User user)
+    public GetTokenEndpoint(Users.User user)
         => User = user;
 
     public async Task<JwtResponse> Execute(CreateJwtRequest request)

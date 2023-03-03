@@ -1,22 +1,17 @@
 ﻿using Staticsoft.PartitionedStorage.Abstractions;
-using Staticsoft.SharpPass.Authentication;
 
 namespace Staticsoft.SharpPass.Server;
 
-public class ListPasswordsEndpoint : HttpEndpoint<EmptyRequest, PasswordProfilesResponse>
+public class ListPasswordsEndpoint : HttpEndpoint<EmptyRequest, PasswordProfiles>
 {
-    readonly Documents Storage;
-    readonly Identity Identity;
+    readonly UserDocuments User;
 
-    public ListPasswordsEndpoint(Documents storage, Identity identity)
-        => (Storage, Identity) = (storage, identity);
+    public ListPasswordsEndpoint(UserDocuments user)
+        => User = user;
 
-    public async Task<PasswordProfilesResponse> Execute(EmptyRequest request)
+    public async Task<PasswordProfiles> Execute(EmptyRequest request)
     {
-        var profiles = await Storage.Profiles.Get(Identity.UserId).Scan();
-        return new()
-        {
-            Results = profiles.Select(item => item.Data).ToArray()
-        };
+        var profiles = await User.Profiles.Scan();
+        return new() { Results = profiles.Select(item => item.Data).ToArray() };
     }
 }

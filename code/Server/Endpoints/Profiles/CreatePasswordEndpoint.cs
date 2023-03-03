@@ -1,27 +1,25 @@
 ﻿using Staticsoft.PartitionedStorage.Abstractions;
-using Staticsoft.SharpPass.Authentication;
 
 namespace Staticsoft.SharpPass.Server;
 
 public class CreatePasswordEndpoint : HttpEndpoint<CreatePasswordRequest, PasswordProfile>
 {
-    readonly Documents Storage;
-    readonly Identity Identity;
+    readonly UserDocuments User;
     readonly PasswordProfileIdGenerator Id;
 
-    public CreatePasswordEndpoint(Documents storage, Identity identity, PasswordProfileIdGenerator id)
-        => (Storage, Identity, Id)
-        = (storage, identity, id);
+    public CreatePasswordEndpoint(UserDocuments user, PasswordProfileIdGenerator id)
+        => (User, Id)
+        = (user, id);
 
     public async Task<PasswordProfile> Execute(CreatePasswordRequest request)
     {
-        var createdDate = DateTime.Now;
+        var createdDate = DateTime.UtcNow;
         var passwordId = Id.Generate(createdDate);
         var profile = new PasswordProfile()
         {
             Id = passwordId,
-            Created = $"{createdDate}",
-            Modified = $"{createdDate}",
+            Created = $"{createdDate:O}",
+            Modified = $"{createdDate:O}",
             Site = request.Site,
             Login = request.Login,
             Uppercase = request.Uppercase,
@@ -32,26 +30,11 @@ public class CreatePasswordEndpoint : HttpEndpoint<CreatePasswordRequest, Passwo
             Counter = request.Counter,
             Version = request.Version
         };
-        await Storage.Profiles.Get(Identity.UserId).Save(new Item<PasswordProfile>()
+        await User.Profiles.Save(new Item<PasswordProfile>()
         {
             Data = profile,
             Id = passwordId
         });
         return profile;
     }
-}
-
-public class PasswordProfileIdGenerator
-{
-    public string Generate(DateTime date)
-        => Generate(DateTime.MaxValue.Ticks - date.Ticks);
-
-    static string Generate(long ticksTillMaxTime)
-        => $"{ToGuid(ticksTillMaxTime)}";
-
-    static Guid ToGuid(long ticks)
-        => ToGuid($"{ticks:X16}");
-
-    static Guid ToGuid(string ticks)
-        => new($"00000000-0000-0000-{ticks[0..4]}-{ticks[4..16]}");
 }

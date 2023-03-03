@@ -1,19 +1,15 @@
-﻿using Staticsoft.SharpPass.Authentication;
-
-namespace Staticsoft.SharpPass.Server;
+﻿namespace Staticsoft.SharpPass.Server;
 
 public class DeletePasswordEndpoint : ParametrizedHttpEndpoint<EmptyRequest, DeletePasswordResponse>
 {
-    readonly Documents Storage;
-    readonly Identity Identity;
+    readonly UserDocuments User;
 
-    public DeletePasswordEndpoint(Documents storage, Identity identity)
-        => (Storage, Identity)
-        = (storage, identity);
+    public DeletePasswordEndpoint(UserDocuments user)
+        => User = user;
 
     public async Task<DeletePasswordResponse> Execute(string passwordId, EmptyRequest request)
     {
-        await Storage.Profiles.Get(Identity.UserId).Remove(passwordId);
+        await User.Profiles.Remove(passwordId);
         return new();
     }
 }

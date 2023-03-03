@@ -23,6 +23,6 @@ public abstract class Startup
         .AddHttpContextAccessor()
         .UseSystemJsonSerializer()
         .AddSingleton<ItemSerializer, JsonItemSerializer>()
-        .AddSingleton<Documents>()
+        .AddSingleton<UserDocuments>()
         .AddSingleton<PasswordProfileIdGenerator>();
 }
