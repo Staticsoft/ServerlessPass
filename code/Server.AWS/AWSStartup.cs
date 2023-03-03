@@ -26,9 +26,9 @@ public class AWSStartup : Startup
         .AddSingleton<Partitions, DynamoDBPartitions>()
         .AddSingleton(new DynamoDBPartitionedStorageOptions() { TableNamePrefix = nameof(SharpPass) })
         .AddSingleton<AmazonDynamoDBClient>()
-        .AddSingleton<User, CognitoUser>()
+        .AddScoped<User, CognitoUser>()
         .AddSingleton(CognitoOptions())
-        .AddSingleton<Identity, ClaimIdentity>();
+        .AddScoped<Identity, ClaimIdentity>();
 
     static CognitoOptions CognitoOptions()
         => new(
