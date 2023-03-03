@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -27,7 +27,7 @@
   </ItemGroup>
     
   <ItemGroup>
-    <PackageReference Include="Staticsoft.Contracts.ASP.Client" Version="1.0.0-10" />
+    <PackageReference Include="Staticsoft.Contracts.ASP.Client" Version="1.0.0-11" />
     <PackageReference Include="Staticsoft.Testing.Integration" Version="1.0.0-6" />
     <PackageReference Include="Staticsoft.Testing.Unit" Version="1.0.0-6" />
   </ItemGroup>

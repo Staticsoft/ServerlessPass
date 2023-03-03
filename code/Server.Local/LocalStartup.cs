@@ -14,5 +14,5 @@ public class LocalStartup : Startup
         .AddSingleton<Partitions, MemoryPartitions>()
         .AddSingleton<User, MemoryUser>()
         .AddSingleton<MemoryUsers>()
-        .AddSingleton<Identity, AuthorizationHeaderIdentity>();
+        .AddScoped<Identity, AuthorizationHeaderIdentity>();
 }

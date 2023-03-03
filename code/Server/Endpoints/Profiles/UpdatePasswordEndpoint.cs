@@ -1,26 +1,23 @@
 ﻿using Staticsoft.PartitionedStorage.Abstractions;
-using Staticsoft.SharpPass.Authentication;
 
 namespace Staticsoft.SharpPass.Server;
 
 public class UpdatePasswordEndpoint : ParametrizedHttpEndpoint<UpdatePasswordRequest, PasswordProfile>
 {
-    readonly Documents Storage;
-    readonly Identity Identity;
+    readonly UserDocuments User;
 
-    public UpdatePasswordEndpoint(Documents storage, Identity identity)
-        => (Storage, Identity)
-        = (storage, identity);
+    public UpdatePasswordEndpoint(UserDocuments user)
+        => User = user;
 
     public async Task<PasswordProfile> Execute(string passwordId, UpdatePasswordRequest request)
     {
-        var existing = await Storage.Profiles.Get(Identity.UserId).Get(passwordId);
-        var modifiedDate = DateTime.Now;
+        var existing = await User.Profiles.Get(passwordId);
+        var modifiedDate = DateTime.UtcNow;
         var profile = new PasswordProfile()
         {
             Id = passwordId,
             Created = existing.Data.Created,
-            Modified = $"{modifiedDate}",
+            Modified = $"{modifiedDate:O}",
             Site = request.Site,
             Login = request.Login,
             Uppercase = request.Uppercase,
@@ -31,7 +28,7 @@ public class UpdatePasswordEndpoint : ParametrizedHttpEndpoint<UpdatePasswordReq
             Counter = request.Counter,
             Version = request.Version
         };
-        await Storage.Profiles.Get(Identity.UserId).Save(new Item<PasswordProfile>()
+        await User.Profiles.Save(new Item<PasswordProfile>()
         {
             Data = profile,
             Id = passwordId,

@@ -121,4 +121,46 @@ public class PasswordsTests : PasswordScenarioBase
         Assert.Equal(0, profiles.Count);
         Assert.Empty(profiles.Results);
     }
+
+    [Fact]
+    public async Task ImportOfExistingProfilesHasNoEffect()
+    {
+        await API.CreatePassword.Execute(new()
+        {
+            Site = "domain.com",
+            Login = "test@mail.com",
+            Uppercase = true,
+            Lowercase = true,
+            Numbers = true,
+            Symbols = true,
+            Length = 16,
+            Counter = 1,
+            Version = 2
+        });
+        var profiles = await API.ListPasswords.Execute();
+        await API.ImportPasswords.Execute(profiles);
+        var imported = await API.ListPasswords.Execute();
+        Assert.Equal(profiles.Results, imported.Results);
+    }
+
+    [Fact]
+    public async Task ImportOfExistingProfileWithDifferentCreatedDateUpdatesProfileId()
+    {
+        var profile = await API.CreatePassword.Execute(new()
+        {
+            Site = "domain.com",
+            Login = "test@mail.com",
+            Uppercase = true,
+            Lowercase = true,
+            Numbers = true,
+            Symbols = true,
+            Length = 16,
+            Counter = 1,
+            Version = 2
+        });
+        var updated = profile with { Created = $"{DateTime.UtcNow:O}" };
+        await API.ImportPasswords.Execute(new() { Results = new[] { updated } });
+        var imported = await API.ListPasswords.Execute();
+        Assert.NotEqual(profile.Id, imported.Results.Single().Id);
+    }
 }
