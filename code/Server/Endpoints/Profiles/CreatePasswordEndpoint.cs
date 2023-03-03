@@ -7,16 +7,16 @@ public class CreatePasswordEndpoint : HttpEndpoint<CreatePasswordRequest, Passwo
 {
     readonly Documents Storage;
     readonly Identity Identity;
+    readonly PasswordProfileIdGenerator Id;
 
-    public CreatePasswordEndpoint(Documents storage, Identity identity)
-        => (Storage, Identity)
-        = (storage, identity);
+    public CreatePasswordEndpoint(Documents storage, Identity identity, PasswordProfileIdGenerator id)
+        => (Storage, Identity, Id)
+        = (storage, identity, id);
 
     public async Task<PasswordProfile> Execute(CreatePasswordRequest request)
     {
         var createdDate = DateTime.Now;
-        var ticksTillMaxTime = DateTime.MaxValue.Ticks - createdDate.Ticks;
-        var passwordId = $"{ToGuid(ticksTillMaxTime)}";
+        var passwordId = Id.Generate(createdDate);
         var profile = new PasswordProfile()
         {
             Id = passwordId,
@@ -39,7 +39,19 @@ public class CreatePasswordEndpoint : HttpEndpoint<CreatePasswordRequest, Passwo
         });
         return profile;
     }
+}
+
+public class PasswordProfileIdGenerator
+{
+    public string Generate(DateTime date)
+        => Generate(DateTime.MaxValue.Ticks - date.Ticks);
+
+    static string Generate(long ticksTillMaxTime)
+        => $"{ToGuid(ticksTillMaxTime)}";
 
     static Guid ToGuid(long ticks)
-        => new(0, 0, 0, BitConverter.GetBytes(ticks));
+        => ToGuid($"{ticks:X16}");
+
+    static Guid ToGuid(string ticks)
+        => new($"00000000-0000-0000-{ticks[0..4]}-{ticks[4..16]}");
 }
