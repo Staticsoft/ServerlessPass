@@ -3,7 +3,7 @@ using Staticsoft.HttpCommunication.Abstractions;
 
 namespace Staticsoft.SharpPass.Tests;
 
-public class PasswordScenarioBase : ScenarioBase, IAsyncLifetime
+public class PasswordScenarioBase : UserScenarioBase, IAsyncLifetime
 {
     protected override IServiceCollection Services => base.Services
         .DecorateSingleton<HttpRequestExecutor, AuthenticatedHttpRequestExecutor>();
