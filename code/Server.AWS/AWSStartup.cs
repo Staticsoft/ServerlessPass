@@ -36,6 +36,7 @@ public class AWSStartup : Startup
     static CognitoOptions CognitoOptions()
         => new(
             userPoolId: Environment.GetEnvironmentVariable("CognitoUserPoolId"),
-            clientId: Environment.GetEnvironmentVariable("CognitoClientAppId")
+            clientId: Environment.GetEnvironmentVariable("CognitoClientAppId"),
+            clientSecret: Environment.GetEnvironmentVariable("CognitoClientAppSecret")
         );
 }
