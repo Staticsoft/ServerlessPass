@@ -2,7 +2,7 @@
 
 namespace Staticsoft.SharpPass.Tests;
 
-public class UsersTests : ScenarioBase
+public class JwtTests : UserScenarioBase
 {
     [Fact]
     public async Task CannotAuthenticateUsingInvalidEmail()

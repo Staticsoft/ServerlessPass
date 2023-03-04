@@ -1,5 +1,7 @@
 ﻿using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Staticsoft.SharpPass.Users.Cognito;
 
@@ -39,7 +41,8 @@ public class CognitoUser : User
             AuthParameters = new()
             {
                 { "USERNAME", username },
-                { "PASSWORD", password }
+                { "PASSWORD", password },
+                { "SECRET_HASH", SecretHash(username) }
             }
         });
         return ToAuthenticatedUser(response);
@@ -62,4 +65,14 @@ public class CognitoUser : User
 
     static AuthenticatedUser ToAuthenticatedUser(AdminInitiateAuthResponse response)
         => new(response.AuthenticationResult.AccessToken, response.AuthenticationResult.RefreshToken);
+
+    string SecretHash(string userName)
+    {
+        var message = Encoding.UTF8.GetBytes(userName + Options.ClientId);
+        var key = Encoding.UTF8.GetBytes(Options.ClientSecret);
+
+        using var hmac = new HMACSHA256(key);
+        var hash = hmac.ComputeHash(message);
+        return Convert.ToBase64String(hash);
+    }
 }

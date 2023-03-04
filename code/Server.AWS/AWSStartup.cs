@@ -24,15 +24,19 @@ public class AWSStartup : Startup
 
     protected override IServiceCollection RegisterServices(IServiceCollection services) => base.RegisterServices(services)
         .AddSingleton<Partitions, DynamoDBPartitions>()
-        .AddSingleton(new DynamoDBPartitionedStorageOptions() { TableNamePrefix = nameof(SharpPass) })
+        .AddSingleton(DynamoDbOptions())
         .AddSingleton<AmazonDynamoDBClient>()
         .AddScoped<User, CognitoUser>()
         .AddSingleton(CognitoOptions())
         .AddScoped<Identity, ClaimIdentity>();
 
+    static DynamoDBPartitionedStorageOptions DynamoDbOptions()
+        => new() { TableNamePrefix = Environment.GetEnvironmentVariable("DynamoDbTableNamePrefix") };
+
     static CognitoOptions CognitoOptions()
         => new(
             userPoolId: Environment.GetEnvironmentVariable("CognitoUserPoolId"),
-            clientId: Environment.GetEnvironmentVariable("CognitoClientAppId")
+            clientId: Environment.GetEnvironmentVariable("CognitoClientAppId"),
+            clientSecret: Environment.GetEnvironmentVariable("CognitoClientAppSecret")
         );
 }
