@@ -7,6 +7,8 @@ namespace Staticsoft.SharpPass.Server;
 
 public abstract class Startup
 {
+    const string CorsPolicy = nameof(CorsPolicy);
+
     public void ConfigureServices(IServiceCollection services)
         => RegisterServices(services);
 
@@ -14,15 +16,27 @@ public abstract class Startup
         => ConfigureApp(app, env);
 
     protected virtual IApplicationBuilder ConfigureApp(IApplicationBuilder app, IWebHostEnvironment env) => app
+        .Use(Cors)
         .UseRouting()
         .UseServerAPIRouting<Schema>();
 
     protected virtual IServiceCollection RegisterServices(IServiceCollection services) => services
-        .AddCors()
         .UseServerAPI<Schema>(Assembly.GetExecutingAssembly())
         .AddHttpContextAccessor()
         .UseSystemJsonSerializer()
         .AddSingleton<ItemSerializer, JsonItemSerializer>()
         .AddScoped<UserDocuments>()
         .AddSingleton<PasswordProfileIdGenerator>();
+
+    static Task Cors(HttpContext context, Func<Task> next)
+    {
+        context.Response.Headers["Access-Control-Allow-Origin"] = "chrome-extension://lcmbpoclaodbgkbjafnkbbinogcbnjih";
+        context.Response.Headers["Access-Control-Allow-Headers"] = "x-requested-with, content-type, accept, origin, authorization, x-csrftoken, user-agent, accept-encoding, cache-control";
+        context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
+
+        if (context.Request.Method != "OPTIONS") return next();
+
+        context.Response.StatusCode = 200;
+        return context.Response.CompleteAsync();
+    }
 }

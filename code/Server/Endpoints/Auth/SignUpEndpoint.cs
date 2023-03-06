@@ -11,7 +11,7 @@ public class SignUpEndpoint : HttpEndpoint<SignUpRequest, SignUpResponse>
 
     public async Task<SignUpResponse> Execute(SignUpRequest request)
     {
-        await User.Create(request.Email, request.Password);
+        await User.Create(request.email, request.password);
         return new();
     }
 }

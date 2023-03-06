@@ -2,13 +2,13 @@
 
 public record PasswordProfileRequest
 {
-    public string Login { get; init; } = string.Empty;
-    public string Site { get; init; } = string.Empty;
-    public bool Uppercase { get; init; }
-    public bool Lowercase { get; init; }
-    public bool Numbers { get; init; }
-    public bool Symbols { get; init; }
-    public int Length { get; init; }
-    public int Counter { get; init; }
-    public int Version { get; init; }
+    public string login { get; init; } = string.Empty;
+    public string site { get; init; } = string.Empty;
+    public bool uppercase { get; init; }
+    public bool lowercase { get; init; }
+    public bool numbers { get; init; }
+    public bool symbols { get; init; }
+    public int length { get; init; }
+    public int counter { get; init; }
+    public int version { get; init; }
 }

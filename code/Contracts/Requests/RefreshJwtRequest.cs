@@ -2,5 +2,5 @@
 
 public class RefreshJwtRequest
 {
-    public string Refresh { get; init; } = string.Empty;
+    public string refresh { get; init; } = string.Empty;
 }

@@ -19,25 +19,25 @@ public class ImportPasswordsEndpoint : HttpEndpoint<PasswordProfiles, PasswordPr
         var profiles = await User.Profiles.Scan();
         await Parallel.ForEachAsync(profiles, Parallelism, DeleteProfile);
 
-        var imported = request.Results.Select(ToImportedProfile).ToArray();
+        var imported = request.results.Select(ToImportedProfile).ToArray();
         await Parallel.ForEachAsync(imported, Parallelism, ImportProfile);
 
-        return new PasswordProfiles() { Results = imported };
+        return new PasswordProfiles() { results = imported };
     }
 
     async ValueTask DeleteProfile(Item<PasswordProfile> profile, CancellationToken _)
         => await User.Profiles.Remove(profile.Id);
 
     PasswordProfile ToImportedProfile(PasswordProfile profile)
-        => ToImportedProfile(profile, DateTime.ParseExact(profile.Created, "O", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind));
+        => ToImportedProfile(profile, DateTime.Parse(profile.created, null, DateTimeStyles.RoundtripKind));
 
     PasswordProfile ToImportedProfile(PasswordProfile profile, DateTime createdDate)
-        => profile with { Id = Id.Generate(createdDate) };
+        => profile with { id = Id.Generate(createdDate) };
 
     async ValueTask ImportProfile(PasswordProfile profile, CancellationToken _)
         => await User.Profiles.Save(new Item<PasswordProfile>
         {
             Data = profile,
-            Id = profile.Id
+            Id = profile.id
         });
 }

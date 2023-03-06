@@ -5,8 +5,8 @@ public class UserScenarioBase : ScenarioBase, IAsyncLifetime
     public virtual Task InitializeAsync()
         => API.Auth.SignUp.Execute(new()
         {
-            Email = User.Email,
-            Password = User.Password
+            email = User.Email,
+            password = User.Password
         });
 
     public virtual Task DisposeAsync()

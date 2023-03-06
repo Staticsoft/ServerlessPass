@@ -9,8 +9,8 @@ public class JwtTests : UserScenarioBase
     {
         await Assert.ThrowsAsync<LogInException>(() => API.Auth.Jwt.Create.Execute(new()
         {
-            Email = "invalid@email.com",
-            Password = User.Password
+            email = "invalid@email.com",
+            password = User.Password
         }));
     }
 
@@ -19,8 +19,8 @@ public class JwtTests : UserScenarioBase
     {
         await Assert.ThrowsAsync<LogInException>(() => API.Auth.Jwt.Create.Execute(new()
         {
-            Email = User.Email,
-            Password = "InvalidPassword"
+            email = User.Email,
+            password = "InvalidPassword"
         }));
     }
 
@@ -29,11 +29,11 @@ public class JwtTests : UserScenarioBase
     {
         var response = await API.Auth.Jwt.Create.Execute(new()
         {
-            Email = User.Email,
-            Password = User.Password
+            email = User.Email,
+            password = User.Password
         });
-        Assert.NotEmpty(response.Access);
-        Assert.NotEmpty(response.Refresh);
+        Assert.NotEmpty(response.access);
+        Assert.NotEmpty(response.refresh);
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class JwtTests : UserScenarioBase
     {
         await Assert.ThrowsAsync<LogInException>(() => API.Auth.Jwt.Refresh.Execute(new()
         {
-            Refresh = "InvalidToken"
+            refresh = "InvalidToken"
         }));
     }
 
@@ -50,14 +50,14 @@ public class JwtTests : UserScenarioBase
     {
         var initialResponse = await API.Auth.Jwt.Create.Execute(new()
         {
-            Email = User.Email,
-            Password = User.Password
+            email = User.Email,
+            password = User.Password
         });
         var secondaryResponse = await API.Auth.Jwt.Refresh.Execute(new()
         {
-            Refresh = initialResponse.Refresh
+            refresh = initialResponse.refresh
         });
-        Assert.NotEmpty(secondaryResponse.Access);
-        Assert.NotEmpty(secondaryResponse.Refresh);
+        Assert.NotEmpty(secondaryResponse.access);
+        Assert.NotEmpty(secondaryResponse.refresh);
     }
 }

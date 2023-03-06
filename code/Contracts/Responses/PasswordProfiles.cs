@@ -4,14 +4,14 @@ namespace Staticsoft.SharpPass.Contracts;
 
 public class PasswordProfiles
 {
-    public PasswordProfile[] Results { get; init; } = Array.Empty<PasswordProfile>();
+    public PasswordProfile[] results { get; init; } = Array.Empty<PasswordProfile>();
 
-    public int Count
-        => Results.Length;
+    public int count
+        => results.Length;
 
-    public string? Previous
+    public string? previous
         => null;
 
-    public string? Next
+    public string? next
         => null;
 }

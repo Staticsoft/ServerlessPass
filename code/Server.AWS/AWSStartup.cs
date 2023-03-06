@@ -1,3 +1,4 @@
+using Amazon.CognitoIdentityProvider;
 using Amazon.DynamoDBv2;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,29 +15,28 @@ namespace Staticsoft.SharpPass.Server.AWS;
 
 public class AWSStartup : Startup
 {
-    protected override IApplicationBuilder ConfigureApp(IApplicationBuilder app, IWebHostEnvironment env) => base.ConfigureApp(app, env)
-        .UseAuthorization()
-        .UseCors(policy => policy
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-        );
+    protected override IApplicationBuilder ConfigureApp(IApplicationBuilder app, IWebHostEnvironment env)
+        => base.ConfigureApp(app, env);
 
     protected override IServiceCollection RegisterServices(IServiceCollection services) => base.RegisterServices(services)
+        .AddCors()
         .AddSingleton<Partitions, DynamoDBPartitions>()
         .AddSingleton(DynamoDbOptions())
         .AddSingleton<AmazonDynamoDBClient>()
         .AddScoped<User, CognitoUser>()
         .AddSingleton(CognitoOptions())
+        .AddSingleton<AmazonCognitoIdentityProviderClient>()
         .AddScoped<Identity, ClaimIdentity>();
 
     static DynamoDBPartitionedStorageOptions DynamoDbOptions()
-        => new() { TableNamePrefix = Environment.GetEnvironmentVariable("DynamoDbTableNamePrefix") };
+        => new() { TableNamePrefix = Configuration("DynamoDbTableNamePrefix") };
 
     static CognitoOptions CognitoOptions()
         => new(
-            userPoolId: Environment.GetEnvironmentVariable("CognitoUserPoolId"),
-            clientId: Environment.GetEnvironmentVariable("CognitoClientAppId"),
-            clientSecret: Environment.GetEnvironmentVariable("CognitoClientAppSecret")
+            userPoolId: Configuration("CognitoUserPoolId"),
+            clientId: Configuration("CognitoClientAppId")
         );
+
+    static string Configuration(string name)
+        => Environment.GetEnvironmentVariable(name) ?? throw new NullReferenceException($"Environment varialbe {name} is not set");
 }

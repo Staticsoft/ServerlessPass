@@ -2,7 +2,7 @@
 
 public record PasswordProfile : PasswordProfileRequest
 {
-    public string Id { get; init; } = string.Empty;
-    public string Created { get; init; } = string.Empty;
-    public string Modified { get; init; } = string.Empty;
+    public string id { get; init; } = string.Empty;
+    public string created { get; init; } = string.Empty;
+    public string modified { get; init; } = string.Empty;
 }

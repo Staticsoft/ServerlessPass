@@ -16,9 +16,9 @@ public class PasswordScenarioBase : UserScenarioBase, IAsyncLifetime
         await base.InitializeAsync();
         var response = await API.Auth.Jwt.Create.Execute(new()
         {
-            Email = User.Email,
-            Password = User.Password
+            email = User.Email,
+            password = User.Password
         });
-        Executor.Token = response.Access;
+        Executor.Token = response.access;
     }
 }
