@@ -13,7 +13,6 @@ public class Jwt
         = (create, refresh);
 
     [Endpoint(HttpMethod.Post)]
-    [EndpointBehavior(statusCode: 201)]
     public HttpEndpoint<CreateJwtRequest, JwtResponse> Create { get; }
 
     [Endpoint(HttpMethod.Post)]

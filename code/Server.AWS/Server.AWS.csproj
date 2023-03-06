@@ -4,10 +4,11 @@
     <RootNamespace>$(Company).$(Product).$(MSBuildProjectName)</RootNamespace>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <AWSProjectType>Lambda</AWSProjectType>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.4" />
-    <PackageReference Include="Amazon.Lambda.AspNetCoreServer" Version="5.1.0" />
+    <PackageReference Include="Amazon.Lambda.AspNetCoreServer" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Authentication.ASP\Authentication.ASP.csproj" />
@@ -19,6 +20,6 @@
   </ItemGroup>
     
    <ItemGroup>
-    <PackageReference Include="Staticsoft.PartitionedStorage.AWS" Version="1.0.0-5" />
+    <PackageReference Include="Staticsoft.PartitionedStorage.AWS" Version="1.0.0-6" />
   </ItemGroup>
 </Project>

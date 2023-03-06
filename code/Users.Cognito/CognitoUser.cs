@@ -1,7 +1,5 @@
 ﻿using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Staticsoft.SharpPass.Users.Cognito;
 
@@ -21,6 +19,7 @@ public class CognitoUser : User
             UserPoolId = Options.UserPoolId,
             Username = username,
             TemporaryPassword = password,
+            MessageAction = MessageActionType.SUPPRESS
         });
         await Client.AdminSetUserPasswordAsync(new AdminSetUserPasswordRequest()
         {
@@ -33,46 +32,36 @@ public class CognitoUser : User
 
     public async Task<AuthenticatedUser> LogIn(string username, string password)
     {
-        var response = await Client.AdminInitiateAuthAsync(new AdminInitiateAuthRequest()
+        var response = await Client.InitiateAuthAsync(new InitiateAuthRequest()
         {
-            AuthFlow = AuthFlowType.ADMIN_USER_PASSWORD_AUTH,
-            UserPoolId = Options.UserPoolId,
+            AuthFlow = AuthFlowType.USER_PASSWORD_AUTH,
             ClientId = Options.ClientId,
             AuthParameters = new()
             {
                 { "USERNAME", username },
-                { "PASSWORD", password },
-                { "SECRET_HASH", SecretHash(username) }
+                { "PASSWORD", password }
             }
         });
-        return ToAuthenticatedUser(response);
+        return new AuthenticatedUser(
+            accessToken: response.AuthenticationResult.IdToken,
+            refreshToken: response.AuthenticationResult.RefreshToken
+        );
     }
 
     public async Task<AuthenticatedUser> LogIn(string refreshToken)
     {
-        var response = await Client.AdminInitiateAuthAsync(new AdminInitiateAuthRequest()
+        var response = await Client.InitiateAuthAsync(new InitiateAuthRequest()
         {
             AuthFlow = AuthFlowType.REFRESH_TOKEN_AUTH,
-            UserPoolId = Options.UserPoolId,
             ClientId = Options.ClientId,
             AuthParameters = new()
             {
                 { "REFRESH_TOKEN", refreshToken }
             }
         });
-        return ToAuthenticatedUser(response);
-    }
-
-    static AuthenticatedUser ToAuthenticatedUser(AdminInitiateAuthResponse response)
-        => new(response.AuthenticationResult.AccessToken, response.AuthenticationResult.RefreshToken);
-
-    string SecretHash(string userName)
-    {
-        var message = Encoding.UTF8.GetBytes(userName + Options.ClientId);
-        var key = Encoding.UTF8.GetBytes(Options.ClientSecret);
-
-        using var hmac = new HMACSHA256(key);
-        var hash = hmac.ComputeHash(message);
-        return Convert.ToBase64String(hash);
+        return new AuthenticatedUser(
+            accessToken: response.AuthenticationResult.IdToken,
+            refreshToken: refreshToken
+        );
     }
 }

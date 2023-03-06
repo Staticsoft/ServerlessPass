@@ -17,18 +17,18 @@ public class CreatePasswordEndpoint : HttpEndpoint<CreatePasswordRequest, Passwo
         var passwordId = Id.Generate(createdDate);
         var profile = new PasswordProfile()
         {
-            Id = passwordId,
-            Created = $"{createdDate:O}",
-            Modified = $"{createdDate:O}",
-            Site = request.Site,
-            Login = request.Login,
-            Uppercase = request.Uppercase,
-            Lowercase = request.Lowercase,
-            Numbers = request.Numbers,
-            Symbols = request.Symbols,
-            Length = request.Length,
-            Counter = request.Counter,
-            Version = request.Version
+            id = passwordId,
+            created = $"{createdDate:O}",
+            modified = $"{createdDate:O}",
+            site = request.site,
+            login = request.login,
+            uppercase = request.uppercase,
+            lowercase = request.lowercase,
+            numbers = request.numbers,
+            symbols = request.symbols,
+            length = request.length,
+            counter = request.counter,
+            version = request.version
         };
         await User.Profiles.Save(new Item<PasswordProfile>()
         {

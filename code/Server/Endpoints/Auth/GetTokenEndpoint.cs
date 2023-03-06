@@ -11,11 +11,11 @@ public class GetTokenEndpoint : HttpEndpoint<CreateJwtRequest, JwtResponse>
 
     public async Task<JwtResponse> Execute(CreateJwtRequest request)
     {
-        var user = await User.LogIn(request.Email, request.Password);
+        var user = await User.LogIn(request.email, request.password);
         return new()
         {
-            Access = user.AccessToken,
-            Refresh = user.RefreshToken
+            access = user.AccessToken,
+            refresh = user.RefreshToken
         };
     }
 }

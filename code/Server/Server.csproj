@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Staticsoft.Contracts.ASP.Server" Version="1.0.0-11" />
-    <PackageReference Include="Staticsoft.PartitionedStorage.Abstractions" Version="1.0.0-5" />
+    <PackageReference Include="Staticsoft.Contracts.ASP.Server" Version="1.0.0-13" />
+    <PackageReference Include="Staticsoft.PartitionedStorage.Abstractions" Version="1.0.0-6" />
     <PackageReference Include="Staticsoft.HttpCommunication.Json" Version="1.0.0-6" />
     <PackageReference Include="Staticsoft.Serialization.Net" Version="1.0.0-6" />
   </ItemGroup>

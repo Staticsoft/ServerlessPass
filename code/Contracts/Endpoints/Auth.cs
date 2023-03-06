@@ -11,6 +11,7 @@ public class Auth
 
     public Jwt Jwt { get; }
 
-    [Endpoint(HttpMethod.Post, pattern: "users")]
+    [Endpoint(HttpMethod.Post, pattern: "Users")]
+    [EndpointBehavior(statusCode: 201)]
     public HttpEndpoint<SignUpRequest, SignUpResponse> SignUp { get; }
 }

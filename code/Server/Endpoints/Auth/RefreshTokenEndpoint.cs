@@ -11,11 +11,11 @@ public class RefreshTokenEndpoint : HttpEndpoint<RefreshJwtRequest, JwtResponse>
 
     public async Task<JwtResponse> Execute(RefreshJwtRequest request)
     {
-        var user = await User.LogIn(request.Refresh);
+        var user = await User.LogIn(request.refresh);
         return new()
         {
-            Access = user.AccessToken,
-            Refresh = user.RefreshToken
+            access = user.AccessToken,
+            refresh = user.RefreshToken
         };
     }
 }

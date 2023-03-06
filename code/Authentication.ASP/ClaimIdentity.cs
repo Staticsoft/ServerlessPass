@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
 
 namespace Staticsoft.SharpPass.Authentication.ASP;
 
@@ -11,10 +10,7 @@ public class ClaimIdentity : Identity
         => Accessor = accessor;
 
     public string UserId
-        => IdentifierClaim.Value;
-
-    Claim IdentifierClaim
-        => Context.User.FindFirst(ClaimTypes.NameIdentifier) ?? throw UnexpectedNullException(nameof(IdentifierClaim));
+        => Context.Features.Get<Claims>().Get("sub");
 
     HttpContext Context
         => Accessor.HttpContext ?? throw UnexpectedNullException(nameof(Context));

@@ -15,18 +15,18 @@ public class UpdatePasswordEndpoint : ParametrizedHttpEndpoint<UpdatePasswordReq
         var modifiedDate = DateTime.UtcNow;
         var profile = new PasswordProfile()
         {
-            Id = passwordId,
-            Created = existing.Data.Created,
-            Modified = $"{modifiedDate:O}",
-            Site = request.Site,
-            Login = request.Login,
-            Uppercase = request.Uppercase,
-            Lowercase = request.Lowercase,
-            Numbers = request.Numbers,
-            Symbols = request.Symbols,
-            Length = request.Length,
-            Counter = request.Counter,
-            Version = request.Version
+            id = passwordId,
+            created = existing.Data.created,
+            modified = $"{modifiedDate:O}",
+            site = request.site,
+            login = request.login,
+            uppercase = request.uppercase,
+            lowercase = request.lowercase,
+            numbers = request.numbers,
+            symbols = request.symbols,
+            length = request.length,
+            counter = request.counter,
+            version = request.version
         };
         await User.Profiles.Save(new Item<PasswordProfile>()
         {
