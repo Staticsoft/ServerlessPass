@@ -20,7 +20,7 @@ jobs:
           code/Server.AWS/Server.AWS.csproj \
           -c Release \
           -o .local/Publish;
-        zip -r .local/Publish .local/Backend.zip;
+        zip -r .local/Backend.zip .local/Publish;
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
