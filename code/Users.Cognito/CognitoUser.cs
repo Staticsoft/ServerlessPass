@@ -1,9 +1,10 @@
 ﻿using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
+using Staticsoft.SharpPass.Services;
 
 namespace Staticsoft.SharpPass.Users.Cognito;
 
-public class CognitoUser : User
+public class CognitoUser : User, ServiceStatus
 {
     readonly AmazonCognitoIdentityProviderClient Client;
     readonly CognitoOptions Options;
@@ -64,4 +65,11 @@ public class CognitoUser : User
             refreshToken: refreshToken
         );
     }
+
+    public Task Check()
+        => Client.ListUsersAsync(new()
+        {
+            Limit = 0,
+            UserPoolId = Options.UserPoolId
+        });
 }

@@ -18,7 +18,7 @@ Resources:
           CognitoUserPoolId:
             Fn::ImportValue: SharpPassUserPoolId
           DynamoDbTableNamePrefix: SharpPass
-  LambdaPermission:
+  LambdaApiGatewayPermission:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
@@ -30,6 +30,32 @@ Resources:
         - arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiId}/*/*/*
         - ApiId:
             Fn::ImportValue: SharpPassApiGatewayId
+  LambdaCloudWatchPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      FunctionName:
+        Ref: LambdaFunction
+      SourceArn:
+        Fn::GetAtt:
+        - StatusTrigger
+        - Arn
+  StatusTrigger:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Checks lambda's status every minute"
+      Name:
+        Fn::Sub: "${LambdaFunction}Status"
+      ScheduleExpression: "rate(1 minute)"
+      State: "ENABLED"
+      Targets:
+      - Id: TriggerEveryMinute
+        Arn:
+          Fn::GetAtt:
+          - LambdaFunction
+          - Arn
+        Input: '{"RequestContext":{"EventType":"CloudWatchTrigger","ResourcePath":"/Administrative/Status"}}'
   ApiGatewayDeployment:
     Type: AWS::ApiGateway::Deployment
     DependsOn:

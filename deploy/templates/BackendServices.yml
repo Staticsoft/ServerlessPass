@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: AWS Services used by the backend.
+Description: SharpPass services used by the backend.
 Parameters:
   ArtifactsBucketName:
     Description: Bucket to store artifacts for the application
@@ -113,6 +113,7 @@ Resources:
           - cognito-idp:AdminInitiateAuth
           - cognito-idp:AdminCreateUser
           - cognito-idp:AdminSetUserPassword
+          - cognito-idp:ListUsers
           Resource:
             Fn::GetAtt:
             - UserPool

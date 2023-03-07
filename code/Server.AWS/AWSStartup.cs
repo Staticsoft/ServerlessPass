@@ -7,6 +7,7 @@ using Staticsoft.PartitionedStorage.Abstractions;
 using Staticsoft.PartitionedStorage.AWS;
 using Staticsoft.SharpPass.Authentication;
 using Staticsoft.SharpPass.Authentication.ASP;
+using Staticsoft.SharpPass.Services;
 using Staticsoft.SharpPass.Users;
 using Staticsoft.SharpPass.Users.Cognito;
 using System;
@@ -23,7 +24,9 @@ public class AWSStartup : Startup
         .AddSingleton<Partitions, DynamoDBPartitions>()
         .AddSingleton(DynamoDbOptions())
         .AddSingleton<AmazonDynamoDBClient>()
-        .AddScoped<User, CognitoUser>()
+        .AddScoped<CognitoUser>()
+        .AddScoped<User>(provider => provider.GetRequiredService<CognitoUser>())
+        .AddScoped<ServiceStatus>(provider => provider.GetRequiredService<CognitoUser>())
         .AddSingleton(CognitoOptions())
         .AddSingleton<AmazonCognitoIdentityProviderClient>()
         .AddScoped<Identity, ClaimIdentity>();
