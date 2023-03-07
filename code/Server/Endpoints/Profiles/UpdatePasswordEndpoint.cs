@@ -4,14 +4,14 @@ namespace Staticsoft.SharpPass.Server;
 
 public class UpdatePasswordEndpoint : ParametrizedHttpEndpoint<UpdatePasswordRequest, PasswordProfile>
 {
-    readonly UserDocuments User;
+    readonly UserProfiles Profiles;
 
-    public UpdatePasswordEndpoint(UserDocuments user)
-        => User = user;
+    public UpdatePasswordEndpoint(UserProfiles profiles)
+        => Profiles = profiles;
 
     public async Task<PasswordProfile> Execute(string passwordId, UpdatePasswordRequest request)
     {
-        var documents = await User.Profiles.Scan();
+        var documents = await Profiles.Scan();
         var (document, index) = FindProfile(documents, passwordId);
         return await UpdateProfile(document, request, index);
     }
@@ -44,7 +44,7 @@ public class UpdatePasswordEndpoint : ParametrizedHttpEndpoint<UpdatePasswordReq
         var profile = GetUpdatedProfile(document, request, index);
         document.Data.Profiles[index] = profile;
 
-        await User.Profiles.Save(new Item<PasswordProfilesDocument>()
+        await Profiles.Save(new Item<PasswordProfilesDocument>()
         {
             Data = document.Data,
             Id = document.Id,

@@ -4,16 +4,16 @@ namespace Staticsoft.SharpPass.Server;
 
 public class DeletePasswordEndpoint : ParametrizedHttpEndpoint<EmptyRequest, DeletePasswordResponse>
 {
-    readonly UserDocuments User;
+    readonly UserProfiles Profiles;
 
-    public DeletePasswordEndpoint(UserDocuments user)
-        => User = user;
+    public DeletePasswordEndpoint(UserProfiles profiles)
+        => Profiles = profiles;
 
     public async Task<DeletePasswordResponse> Execute(string passwordId, EmptyRequest request)
     {
-        var profiles = await User.Profiles.Scan();
+        var profiles = await Profiles.Scan();
         var (profile, index) = FindProfile(profiles, passwordId);
-        await User.Profiles.Save(new Item<PasswordProfilesDocument>()
+        await Profiles.Save(new Item<PasswordProfilesDocument>()
         {
             Data = new PasswordProfilesDocument()
             {

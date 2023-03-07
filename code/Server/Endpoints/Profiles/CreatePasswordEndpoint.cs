@@ -4,17 +4,17 @@ namespace Staticsoft.SharpPass.Server;
 
 public class CreatePasswordEndpoint : HttpEndpoint<CreatePasswordRequest, PasswordProfile>
 {
-    readonly UserDocuments User;
+    readonly UserProfiles Profiles;
     readonly PasswordProfilesIdGenerator Id;
 
-    public CreatePasswordEndpoint(UserDocuments user, PasswordProfilesIdGenerator id)
-        => (User, Id)
-        = (user, id);
+    public CreatePasswordEndpoint(UserProfiles profiles, PasswordProfilesIdGenerator id)
+        => (Profiles, Id)
+        = (profiles, id);
 
     public async Task<PasswordProfile> Execute(CreatePasswordRequest request)
     {
         var profile = ToNewProfile(request);
-        var documents = await User.Profiles.Scan(new ScanOptions { MaxItems = 1 });
+        var documents = await Profiles.Scan(new ScanOptions { MaxItems = 1 });
         var document = documents.FirstOrDefault();
         if (document != null && document.Data.Profiles.Length < 500)
         {
@@ -32,7 +32,7 @@ public class CreatePasswordEndpoint : HttpEndpoint<CreatePasswordRequest, Passwo
         var updatedProfiles = new PasswordProfile[document.Data.Profiles.Length + 1];
         updatedProfiles[0] = profile;
         Array.Copy(document.Data.Profiles, 0, updatedProfiles, 1, document.Data.Profiles.Length);
-        return User.Profiles.Save(new()
+        return Profiles.Save(new()
         {
             Data = new()
             {
@@ -44,7 +44,7 @@ public class CreatePasswordEndpoint : HttpEndpoint<CreatePasswordRequest, Passwo
     }
 
     Task CreateProfile(PasswordProfile profile)
-        => User.Profiles.Save(new()
+        => Profiles.Save(new()
         {
             Data = new()
             {
