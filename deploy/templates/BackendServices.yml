@@ -1,0 +1,320 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS Services used by the backend.
+Parameters:
+  ArtifactsBucketName:
+    Description: Bucket to store artifacts for the application
+    Type: String
+  DomainName:
+    Description: Domain name used to communicate to the backend
+    Type: String
+  DomainHostedZoneId:
+    Description: Hosted zone id of domain used to communicate to the backend
+    Type: String
+Resources:
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName:
+        Ref: DomainName
+      DomainValidationOptions:
+      - DomainName:
+          Ref: DomainName
+        HostedZoneId:
+          Ref: DomainHostedZoneId
+      ValidationMethod: DNS
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+        - Name: verified_email
+          Priority: 1
+      AutoVerifiedAttributes:
+      - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          RequireUppercase: true
+          TemporaryPasswordValidityDays: 1
+      UsernameAttributes:
+      - email
+      UsernameConfiguration:
+        CaseSensitive: false
+      UserPoolName: "SharpPassUsers"
+      VerificationMessageTemplate:
+        DefaultEmailOption: CONFIRM_WITH_LINK
+        EmailMessageByLink: Please click the link below to verify your email address.
+          {##Verify email##}
+        EmailSubjectByLink: Email verification is required
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: BackendUserPoolClient
+      ExplicitAuthFlows:
+      - ALLOW_REFRESH_TOKEN_AUTH
+      - ALLOW_USER_PASSWORD_AUTH
+      SupportedIdentityProviders:
+      - COGNITO
+      UserPoolId:
+        Ref: UserPool
+      TokenValidityUnits:
+        AccessToken: days
+        IdToken: days
+        RefreshToken: days
+      RefreshTokenValidity: 3650
+      AccessTokenValidity: 1
+      IdTokenValidity: 1
+  Table:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: PartitionKey
+        AttributeType: S
+      - AttributeName: SortKey
+        AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+      - AttributeName: PartitionKey
+        KeyType: HASH
+      - AttributeName: SortKey
+        KeyType: RANGE
+      TableName: SharpPassPartitionedStorage
+  LambdaFunctionRolePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: SharpPassLambdaPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - "logs:CreateLogGroup"
+          - "logs:CreateLogStream"
+          - "logs:PutLogEvents"
+          Resource: "arn:aws:logs:*:*:*"
+        - Effect: Allow
+          Action:
+          - dynamodb:DescribeTable
+          - dynamodb:PutItem
+          - dynamodb:GetItem
+          - dynamodb:Query
+          - dynamodb:Scan
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+          Resource:
+            Fn::GetAtt:
+            - Table
+            - Arn
+        - Effect: "Allow"
+          Action:
+          - cognito-idp:AdminInitiateAuth
+          - cognito-idp:AdminCreateUser
+          - cognito-idp:AdminSetUserPassword
+          Resource:
+            Fn::GetAtt:
+            - UserPool
+            - Arn
+  LambdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+      ManagedPolicyArns:
+      - Ref: LambdaFunctionRolePolicy
+  ArtifactsBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      BucketName:
+        Ref: ArtifactsBucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+        - ExpirationInDays: 1
+          Status: Enabled
+  CodeBuildLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: "SharpPassBackendCodeBuildLogs"
+      RetentionInDays: 90
+  CodeBuildPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: SharpPassBackendCodeBuildPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - iam:PassRole
+          Resource:
+          - "*"
+        - Effect: Allow
+          Action:
+          - logs:CreateLogStream
+          - logs:DeleteLogStream
+          - logs:PutLogEvents
+          Resource:
+            Fn::GetAtt:
+            - CodeBuildLogs
+            - Arn
+        - Effect: Allow
+          Action:
+          - s3:GetObject
+          - s3:PutObject
+          - s3:DeleteObject
+          - s3:DeleteObjectVersion
+          Resource:
+            Fn::Sub:
+            - "${ArtifactsBucketArn}/*"
+            - ArtifactsBucketArn:
+                Fn::GetAtt:
+                - ArtifactsBucket
+                - Arn
+        - Effect: Allow
+          Action:
+          - lambda:GetFunction
+          - lambda:UpdateFunctionCode
+          - lambda:UpdateFunctionConfiguration
+          - lambda:CreateFunction
+          - lambda:DeleteFunction
+          - lambda:AddPermission
+          - lambda:RemovePermission
+          Resource:
+            Fn::Sub: "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:SharpPassLambda*"
+        - Effect: Allow
+          Action:
+          - cloudformation:CreateStack
+          - cloudformation:UpdateStack
+          - cloudformation:DescribeStacks
+          Resource:
+          - Fn::Sub: "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/SharpPassLambda"
+          - Fn::Sub: "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/SharpPassLambda/*"
+        - Effect: Allow
+          Action:
+          - apigateway:GET
+          - apigateway:POST
+          - apigateway:PATCH
+          - apigateway:PUT
+          - apigateway:DELETE
+          - apigateway:TagResource
+          Resource:
+          - Fn::Sub: "arn:aws:apigateway:${AWS::Region}::/tags/*"
+          - Fn::Sub: "arn:aws:apigateway:${AWS::Region}::/restapis/${ApiGateway}/*"
+          - Fn::Sub: "arn:aws:apigateway:${AWS::Region}::/domainnames/${ApiGatewayDomain}/basepathmappings"
+          - Fn::Sub: "arn:aws:apigateway:${AWS::Region}::/domainnames/${ApiGatewayDomain}/basepathmappings/*"
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - codebuild.amazonaws.com
+      ManagedPolicyArns:
+      - Ref: CodeBuildPolicy
+  ApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: SharpPassApi
+  Authorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: SharpPassAuthorizer
+      RestApiId:
+        Ref: ApiGateway
+      Type: COGNITO_USER_POOLS
+      ProviderARNs:
+      - Fn::Sub: "arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${UserPool}"
+      IdentitySource: method.request.header.Authorization
+      AuthorizerResultTtlInSeconds: 3600
+  ApiGatewayDomain:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      CertificateArn:
+        Ref: Certificate
+      DomainName:
+        Ref: DomainName
+      EndpointConfiguration:
+        Types:
+        - EDGE
+      SecurityPolicy: TLS_1_2
+  ApiDNSRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId:
+        Ref: DomainHostedZoneId
+      Name:
+        Ref: DomainName
+      AliasTarget:
+        DNSName:
+          Fn::GetAtt:
+          - ApiGatewayDomain
+          - DistributionDomainName
+        EvaluateTargetHealth: false
+        HostedZoneId: Z2FDTNDATAQYW2
+      Type: A
+Outputs:
+  LambdaFunctionRoleArn:
+    Value:
+      Fn::GetAtt:
+      - LambdaFunctionRole
+      - Arn
+    Export:
+      Name: SharpPassLambdaFunctionRoleArn
+  UserPoolId:
+    Value:
+      Ref: UserPool
+    Export:
+      Name: SharpPassUserPoolId
+  UserPoolClientId:
+    Value:
+      Ref: UserPoolClient
+    Export:
+      Name: SharpPassUserPoolClientId
+  ApiGatewayId:
+    Value:
+      Ref: ApiGateway
+    Export:
+      Name: SharpPassApiGatewayId
+  ApiGatewayRootResourceId:
+    Value:
+      Fn::GetAtt:
+      - ApiGateway
+      - RootResourceId
+    Export:
+      Name: SharpPassApiGatewayRootResourceId
+  AuthorizerId:
+    Value:
+      Ref: Authorizer
+    Export:
+      Name: SharpPassAuthorizerId
+  DomainName:
+    Value:
+      Ref: ApiGatewayDomain
+    Export:
+      Name:
+        SharpPassApiGatewayDomainName
+  ArtifactsBucketName:
+    Value:
+      Ref: ArtifactsBucket
+    Export:
+      Name: SharpPassArtifactsBucketName
