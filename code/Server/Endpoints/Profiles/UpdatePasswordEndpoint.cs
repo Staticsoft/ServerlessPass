@@ -4,36 +4,47 @@ namespace Staticsoft.SharpPass.Server;
 
 public class UpdatePasswordEndpoint : ParametrizedHttpEndpoint<UpdatePasswordRequest, PasswordProfile>
 {
-    readonly UserDocuments User;
+    readonly ProfilesDocuments Documents;
 
-    public UpdatePasswordEndpoint(UserDocuments user)
-        => User = user;
+    public UpdatePasswordEndpoint(ProfilesDocuments documents)
+        => Documents = documents;
 
-    public async Task<PasswordProfile> Execute(string passwordId, UpdatePasswordRequest request)
+    public async Task<PasswordProfile> Execute(string profileId, UpdatePasswordRequest request)
     {
-        var existing = await User.Profiles.Get(passwordId);
-        var modifiedDate = DateTime.UtcNow;
-        var profile = new PasswordProfile()
+        var documents = await Documents.Scan();
+        var (document, profileIndex) = documents.FindProfileDocument(profileId);
+        return await UpdateProfile(document, request, profileIndex);
+    }
+
+
+    async Task<PasswordProfile> UpdateProfile(Item<PasswordProfilesDocument> document, UpdatePasswordRequest request, int profileIndex)
+    {
+        var profile = GetUpdatedProfile(document, request, profileIndex);
+        document.Data.Profiles[profileIndex] = profile;
+
+        await Documents.Save(new Item<PasswordProfilesDocument>()
         {
-            id = passwordId,
-            created = existing.Data.created,
-            modified = $"{modifiedDate:O}",
-            site = request.site,
-            login = request.login,
-            uppercase = request.uppercase,
-            lowercase = request.lowercase,
-            numbers = request.numbers,
-            symbols = request.symbols,
-            length = request.length,
-            counter = request.counter,
-            version = request.version
-        };
-        await User.Profiles.Save(new Item<PasswordProfile>()
-        {
-            Data = profile,
-            Id = passwordId,
-            Version = existing.Version
+            Data = document.Data,
+            Id = document.Id,
+            Version = document.Version
         });
+
         return profile;
     }
+
+    static PasswordProfile GetUpdatedProfile(Item<PasswordProfilesDocument> document, UpdatePasswordRequest request, int profileIndex) => new()
+    {
+        id = document.Data.Profiles[profileIndex].id,
+        created = document.Data.Profiles[profileIndex].created,
+        modified = $"{DateTime.UtcNow:O}",
+        site = request.site,
+        login = request.login,
+        uppercase = request.uppercase,
+        lowercase = request.lowercase,
+        numbers = request.numbers,
+        symbols = request.symbols,
+        length = request.length,
+        counter = request.counter,
+        version = request.version
+    };
 }

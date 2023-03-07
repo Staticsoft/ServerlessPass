@@ -1,4 +1,5 @@
 ﻿using Staticsoft.Contracts.Abstractions;
+using Staticsoft.SharpPass.Contracts;
 
 namespace Staticsoft.SharpPass.Tests;
 
@@ -123,6 +124,26 @@ public class PasswordsTests : PasswordScenarioBase
     }
 
     [Fact]
+    public async Task ImportOfEmptyListOfProfilesRemovesAllProfiles()
+    {
+        await API.Passwords.Create.Execute(new()
+        {
+            site = "domain.com",
+            login = "test@mail.com",
+            uppercase = true,
+            lowercase = true,
+            numbers = true,
+            symbols = true,
+            length = 16,
+            counter = 1,
+            version = 2
+        });
+        await API.Passwords.Import.Execute(new() { results = Array.Empty<PasswordProfile>() });
+        var imported = await API.Passwords.List.Execute();
+        Assert.Empty(imported.results);
+    }
+
+    [Fact]
     public async Task ImportOfExistingProfilesHasNoEffect()
     {
         await API.Passwords.Create.Execute(new()
@@ -144,23 +165,67 @@ public class PasswordsTests : PasswordScenarioBase
     }
 
     [Fact]
-    public async Task ImportOfExistingProfileWithDifferentCreatedDateUpdatesProfileId()
+    public async Task ReturnsProfilesInReverseChronologicalOrder()
     {
-        var profile = await API.Passwords.Create.Execute(new()
+        await API.Passwords.Create.Execute(new()
         {
-            site = "domain.com",
-            login = "test@mail.com",
-            uppercase = true,
-            lowercase = true,
-            numbers = true,
-            symbols = true,
-            length = 16,
-            counter = 1,
-            version = 2
+            site = "earlier.domain.com"
         });
-        var updated = profile with { created = $"{DateTime.UtcNow:O}" };
-        await API.Passwords.Import.Execute(new() { results = new[] { updated } });
+        await API.Passwords.Create.Execute(new()
+        {
+            site = "later.domain.com"
+        });
+        var profiles = await API.Passwords.List.Execute();
+        Assert.Equal(
+            new[] { "later.domain.com", "earlier.domain.com" },
+            profiles.results.Select(profile => profile.site)
+        );
+    }
+
+    [Fact]
+    public async Task ImportsProfilesInReverseChronologicalOrder()
+    {
+        await API.Passwords.Create.Execute(new()
+        {
+            site = "earlier.domain.com"
+        });
+        await API.Passwords.Create.Execute(new()
+        {
+            site = "later.domain.com"
+        });
+        var profiles = await API.Passwords.List.Execute();
+        await API.Passwords.Import.Execute(profiles);
         var imported = await API.Passwords.List.Execute();
-        Assert.NotEqual(profile.id, imported.results.Single().id);
+        Assert.Equal(profiles.results, imported.results);
+    }
+
+    [Fact]
+    public async Task CanCreate1001Profile()
+    {
+        await CreateProfiles(1001);
+        var profiles = await API.Passwords.List.Execute();
+        Assert.Equal(1001, profiles.count);
+    }
+
+    [Fact]
+    public async Task CanImport1001Profile()
+    {
+        await CreateProfiles(1001);
+        var profiles = await API.Passwords.List.Execute();
+        await API.Passwords.Import.Execute(profiles);
+        var imported = await API.Passwords.List.Execute();
+        Assert.Equal(profiles.results, imported.results);
+    }
+
+    async Task CreateProfiles(int profilesCount)
+    {
+        foreach (var loginId in Enumerable.Range(0, profilesCount))
+        {
+            await API.Passwords.Create.Execute(new()
+            {
+                site = "domain.com",
+                login = $"test{loginId}@mail.com"
+            });
+        }
     }
 }

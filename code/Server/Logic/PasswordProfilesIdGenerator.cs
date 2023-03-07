@@ -1,6 +1,6 @@
 ﻿namespace Staticsoft.SharpPass.Server;
 
-public class PasswordProfileIdGenerator
+public class PasswordProfilesIdGenerator
 {
     public string Generate(DateTime date)
         => Generate(DateTime.MaxValue.Ticks - date.Ticks);

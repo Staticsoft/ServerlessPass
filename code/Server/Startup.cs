@@ -1,6 +1,7 @@
 using Staticsoft.Contracts.ASP.Server;
 using Staticsoft.PartitionedStorage.Abstractions;
 using Staticsoft.Serialization.Net;
+using Staticsoft.SharpPass.Authentication;
 using System.Reflection;
 
 namespace Staticsoft.SharpPass.Server;
@@ -25,8 +26,11 @@ public abstract class Startup
         .AddHttpContextAccessor()
         .UseSystemJsonSerializer()
         .AddSingleton<ItemSerializer, JsonItemSerializer>()
-        .AddScoped<UserDocuments>()
-        .AddSingleton<PasswordProfileIdGenerator>();
+        .AddScoped(AddUserProfiles)
+        .AddSingleton<PasswordProfilesIdGenerator>();
+
+    static ProfilesDocuments AddUserProfiles(IServiceProvider services)
+        => services.GetRequiredService<Partitions>().GetFactory<PasswordProfilesDocument>().Get(services.GetRequiredService<Identity>().UserId);
 
     static Task Cors(HttpContext context, Func<Task> next)
     {
