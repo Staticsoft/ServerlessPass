@@ -16,12 +16,8 @@ jobs:
         dotnet \
           publish \
           ./code/Server.AWS/Server.AWS.csproj \
-          //p:GenerateRuntimeConfigurationFiles=true \
-          //p:PublishReadyToRun=true \
           -c Release \
-          -o .local/Publish \
-          -r linux-x64
-          --no-self-contained;
+          -o .local/Publish;
         zip -r .local/Publish .local/Backend.zip;
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:

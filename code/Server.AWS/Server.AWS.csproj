@@ -6,6 +6,9 @@
     <AWSProjectType>Lambda</AWSProjectType>
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
