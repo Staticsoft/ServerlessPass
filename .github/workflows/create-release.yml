@@ -1,0 +1,30 @@
+name: "Release"
+on:
+  push:
+    branches:
+    - master
+jobs:
+  Release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Build and zip backend
+      run: |
+        dotnet \
+          publish \
+          ./code/Server.AWS/Server.AWS.csproj \
+          /p:GenerateRuntimeConfigurationFiles=true \
+          /p:PublishReadyToRun=true \
+          -c Release \
+          -o .local/Publish \
+          -r linux-x64;
+        zip -r .local/Publish .local/Backend.zip;
+    - uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: false
+        title: "Automatic release ${{ github.run_number }}"
+        files: |
+          .local/Backend.zip
+          deploy/templates/BackendLambda.yml
+          
