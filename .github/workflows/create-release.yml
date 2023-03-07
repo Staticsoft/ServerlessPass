@@ -7,16 +7,21 @@ jobs:
   Release:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: | 
+          6.0.x
     - name: Build and zip backend
       run: |
         dotnet \
           publish \
           ./code/Server.AWS/Server.AWS.csproj \
-          /p:GenerateRuntimeConfigurationFiles=true \
-          /p:PublishReadyToRun=true \
+          //p:GenerateRuntimeConfigurationFiles=true \
+          //p:PublishReadyToRun=true \
           -c Release \
           -o .local/Publish \
-          -r linux-x64;
+          -r linux-x64
+          --no-self-contained;
         zip -r .local/Publish .local/Backend.zip;
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:

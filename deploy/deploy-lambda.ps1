@@ -12,6 +12,7 @@ function Publish-Code {
         "$Local/Publish"
         '-r'
         'linux-x64'
+        '--no-self-contained'
     )
 }
 
