@@ -7,7 +7,7 @@ jobs:
   Release:
     runs-on: ubuntu-latest
     steps:
-    - name: Build and zip project
+    - name: Build and zip backend
       run: |
         dotnet \
           publish \
