@@ -4,15 +4,28 @@ namespace Staticsoft.SharpPass.Server;
 
 public class ListPasswordsEndpoint : HttpEndpoint<EmptyRequest, PasswordProfiles>
 {
-    readonly UserProfiles Profiles;
+    readonly ProfilesDocuments Documents;
 
-    public ListPasswordsEndpoint(UserProfiles profiles)
-        => Profiles = profiles;
+    public ListPasswordsEndpoint(ProfilesDocuments documents)
+        => Documents = documents;
 
     public async Task<PasswordProfiles> Execute(EmptyRequest request)
     {
-        var documents = await Profiles.Scan();
-        var profiles = documents.SelectMany(document => document.Data.Profiles).ToArray();
+        var documents = await Documents.Scan();
+        var profiles = CombineDocumentsProfiles(documents);
         return new() { results = profiles };
+    }
+
+    static PasswordProfile[] CombineDocumentsProfiles(Item<PasswordProfilesDocument>[] documents)
+    {
+        var profilesCount = documents.Sum(document => document.Data.Profiles.Length);
+        var profiles = new PasswordProfile[profilesCount];
+        var copied = 0;
+        foreach (var document in documents)
+        {
+            Array.Copy(document.Data.Profiles, 0, profiles, copied, document.Data.Profiles.Length);
+            copied += document.Data.Profiles.Length;
+        }
+        return profiles;
     }
 }

@@ -4,57 +4,34 @@ namespace Staticsoft.SharpPass.Server;
 
 public class DeletePasswordEndpoint : ParametrizedHttpEndpoint<EmptyRequest, DeletePasswordResponse>
 {
-    readonly UserProfiles Profiles;
+    readonly ProfilesDocuments Documents;
 
-    public DeletePasswordEndpoint(UserProfiles profiles)
-        => Profiles = profiles;
+    public DeletePasswordEndpoint(ProfilesDocuments documents)
+        => Documents = documents;
 
-    public async Task<DeletePasswordResponse> Execute(string passwordId, EmptyRequest request)
+    public async Task<DeletePasswordResponse> Execute(string profileId, EmptyRequest _)
     {
-        var profiles = await Profiles.Scan();
-        var (profile, index) = FindProfile(profiles, passwordId);
-        await Profiles.Save(new Item<PasswordProfilesDocument>()
+        var documents = await Documents.Scan();
+        var (document, profileIndex) = documents.FindProfileDocument(profileId);
+        await Documents.Save(new Item<PasswordProfilesDocument>()
         {
             Data = new PasswordProfilesDocument()
             {
-                Profiles = RemoveProfile(profile.Data.Profiles, index)
+                Profiles = RemoveProfile(document.Data.Profiles, profileIndex)
             },
-            Id = profile.Id,
-            Version = profile.Version
+            Id = document.Id,
+            Version = document.Version
         });
         return new();
     }
 
-    static PasswordProfile[] RemoveProfile(PasswordProfile[] profiles, int index)
+    static PasswordProfile[] RemoveProfile(PasswordProfile[] profiles, int profileIndex)
     {
-        var left = profiles[..index];
-        var right = profiles[(index + 1)..];
+        var left = profiles[..profileIndex];
+        var right = profiles[(profileIndex + 1)..];
         var updatedProfiles = new PasswordProfile[left.Length + right.Length];
         Array.Copy(left, updatedProfiles, left.Length);
         Array.Copy(right, 0, updatedProfiles, left.Length, right.Length);
         return updatedProfiles;
-    }
-
-    static (Item<PasswordProfilesDocument>, int) FindProfile(Item<PasswordProfilesDocument>[] documents, string passwordId)
-    {
-        foreach (var document in documents)
-        {
-            var index = FindProfileIndex(document.Data, passwordId);
-            if (index != -1) return (document, index);
-        }
-
-        throw new NotSupportedException();
-    }
-
-    static int FindProfileIndex(PasswordProfilesDocument document, string passwordId)
-    {
-        for (var i = 0; i < document.Profiles.Length; i++)
-        {
-            if (document.Profiles[i].id == passwordId)
-            {
-                return i;
-            }
-        }
-        return -1;
     }
 }

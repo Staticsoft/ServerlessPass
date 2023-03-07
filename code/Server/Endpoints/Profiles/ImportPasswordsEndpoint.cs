@@ -4,28 +4,28 @@ namespace Staticsoft.SharpPass.Server;
 
 public class ImportPasswordsEndpoint : HttpEndpoint<PasswordProfiles, PasswordProfiles>
 {
-    readonly UserProfiles Profiles;
+    readonly ProfilesDocuments Documents;
     readonly PasswordProfilesIdGenerator Id;
 
-    public ImportPasswordsEndpoint(UserProfiles profiles, PasswordProfilesIdGenerator id)
-        => (Profiles, Id)
-        = (profiles, id);
+    public ImportPasswordsEndpoint(ProfilesDocuments documents, PasswordProfilesIdGenerator id)
+        => (Documents, Id)
+        = (documents, id);
 
     public async Task<PasswordProfiles> Execute(PasswordProfiles request)
     {
-        var existing = await Profiles.Scan();
+        var existing = await Documents.Scan();
         foreach (var document in existing)
         {
-            await Profiles.Remove(document.Id);
+            await Documents.Remove(document.Id);
         }
         var profiles = request.results.OrderByDescending(profile => profile.created).ToArray();
-        for (var i = profiles.Length; i >= 0; i -= 500)
+        for (var i = profiles.Length; i >= 0; i -= MaxProfilesPerDocument)
         {
-            await Profiles.Save(new()
+            await Documents.Save(new()
             {
                 Data = new()
                 {
-                    Profiles = profiles[Math.Max(0, i - 500)..i]
+                    Profiles = profiles[Math.Max(0, i - MaxProfilesPerDocument)..i]
                 },
                 Id = Id.Generate(DateTime.UtcNow)
             });

@@ -29,7 +29,7 @@ public abstract class Startup
         .AddScoped(AddUserProfiles)
         .AddSingleton<PasswordProfilesIdGenerator>();
 
-    static UserProfiles AddUserProfiles(IServiceProvider services)
+    static ProfilesDocuments AddUserProfiles(IServiceProvider services)
         => services.GetRequiredService<Partitions>().GetFactory<PasswordProfilesDocument>().Get(services.GetRequiredService<Identity>().UserId);
 
     static Task Cors(HttpContext context, Func<Task> next)
