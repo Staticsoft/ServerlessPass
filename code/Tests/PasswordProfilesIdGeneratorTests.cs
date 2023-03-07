@@ -3,14 +3,14 @@ using Staticsoft.SharpPass.Server;
 
 namespace Staticsoft.SharpPass.Tests;
 
-public class PasswordProfileIdGeneratorServices : UnitServicesBase
+public class PasswordProfilesIdGeneratorServices : UnitServicesBase
 {
     protected override IServiceCollection Services => base.Services
-        .AddSingleton<PasswordProfileIdGenerator>();
+        .AddSingleton<PasswordProfilesIdGenerator>();
 }
 
 
-public class PasswordProfileIdGeneratorTests : TestBase<PasswordProfileIdGenerator, PasswordProfileIdGeneratorServices>
+public class PasswordProfilesIdGeneratorTests : TestBase<PasswordProfilesIdGenerator, PasswordProfilesIdGeneratorServices>
 {
     [Fact]
     public void GeneratesIdsInReverseOrder()

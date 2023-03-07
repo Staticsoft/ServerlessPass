@@ -26,7 +26,7 @@ public abstract class Startup
         .UseSystemJsonSerializer()
         .AddSingleton<ItemSerializer, JsonItemSerializer>()
         .AddScoped<UserDocuments>()
-        .AddSingleton<PasswordProfileIdGenerator>();
+        .AddSingleton<PasswordProfilesIdGenerator>();
 
     static Task Cors(HttpContext context, Func<Task> next)
     {

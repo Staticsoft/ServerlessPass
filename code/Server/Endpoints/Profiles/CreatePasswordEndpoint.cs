@@ -5,19 +5,60 @@ namespace Staticsoft.SharpPass.Server;
 public class CreatePasswordEndpoint : HttpEndpoint<CreatePasswordRequest, PasswordProfile>
 {
     readonly UserDocuments User;
-    readonly PasswordProfileIdGenerator Id;
+    readonly PasswordProfilesIdGenerator Id;
 
-    public CreatePasswordEndpoint(UserDocuments user, PasswordProfileIdGenerator id)
+    public CreatePasswordEndpoint(UserDocuments user, PasswordProfilesIdGenerator id)
         => (User, Id)
         = (user, id);
 
     public async Task<PasswordProfile> Execute(CreatePasswordRequest request)
     {
+        var profile = ToNewProfile(request);
+        var documents = await User.Profiles.Scan(new ScanOptions { MaxItems = 1 });
+        var document = documents.FirstOrDefault();
+        if (document != null && document.Data.Profiles.Length < 500)
+        {
+            await CreateProfile(document, profile);
+        }
+        else
+        {
+            await CreateProfile(profile);
+        }
+        return profile;
+    }
+
+    Task CreateProfile(Item<PasswordProfilesDocument> document, PasswordProfile profile)
+    {
+        var updatedProfiles = new PasswordProfile[document.Data.Profiles.Length + 1];
+        updatedProfiles[0] = profile;
+        Array.Copy(document.Data.Profiles, 0, updatedProfiles, 1, document.Data.Profiles.Length);
+        return User.Profiles.Save(new()
+        {
+            Data = new()
+            {
+                Profiles = updatedProfiles,
+            },
+            Id = document.Id,
+            Version = document.Version
+        });
+    }
+
+    Task CreateProfile(PasswordProfile profile)
+        => User.Profiles.Save(new()
+        {
+            Data = new()
+            {
+                Profiles = new[] { profile }
+            },
+            Id = Id.Generate(DateTime.UtcNow)
+        });
+
+    static PasswordProfile ToNewProfile(CreatePasswordRequest request)
+    {
         var createdDate = DateTime.UtcNow;
-        var passwordId = Id.Generate(createdDate);
         var profile = new PasswordProfile()
         {
-            id = passwordId,
+            id = $"{Guid.NewGuid()}",
             created = $"{createdDate:O}",
             modified = $"{createdDate:O}",
             site = request.site,
@@ -30,11 +71,6 @@ public class CreatePasswordEndpoint : HttpEndpoint<CreatePasswordRequest, Passwo
             counter = request.counter,
             version = request.version
         };
-        await User.Profiles.Save(new Item<PasswordProfile>()
-        {
-            Data = profile,
-            Id = passwordId
-        });
         return profile;
     }
 }

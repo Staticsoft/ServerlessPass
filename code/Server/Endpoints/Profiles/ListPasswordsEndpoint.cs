@@ -11,7 +11,8 @@ public class ListPasswordsEndpoint : HttpEndpoint<EmptyRequest, PasswordProfiles
 
     public async Task<PasswordProfiles> Execute(EmptyRequest request)
     {
-        var profiles = await User.Profiles.Scan();
-        return new() { results = profiles.Select(item => item.Data).ToArray() };
+        var documents = await User.Profiles.Scan();
+        var profiles = documents.SelectMany(document => document.Data.Profiles).ToArray();
+        return new() { results = profiles };
     }
 }

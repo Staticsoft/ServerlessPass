@@ -5,9 +5,11 @@
     <RootNamespace>$(Company).$(Product).$(MSBuildProjectName)</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Logic\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 

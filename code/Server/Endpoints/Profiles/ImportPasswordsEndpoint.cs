@@ -1,43 +1,35 @@
 ﻿using Staticsoft.PartitionedStorage.Abstractions;
-using System.Globalization;
 
 namespace Staticsoft.SharpPass.Server;
 
 public class ImportPasswordsEndpoint : HttpEndpoint<PasswordProfiles, PasswordProfiles>
 {
     readonly UserDocuments User;
-    readonly PasswordProfileIdGenerator Id;
+    readonly PasswordProfilesIdGenerator Id;
 
-    static readonly ParallelOptions Parallelism = new() { MaxDegreeOfParallelism = 10 };
-
-    public ImportPasswordsEndpoint(UserDocuments user, PasswordProfileIdGenerator id)
+    public ImportPasswordsEndpoint(UserDocuments user, PasswordProfilesIdGenerator id)
         => (User, Id)
         = (user, id);
 
     public async Task<PasswordProfiles> Execute(PasswordProfiles request)
     {
-        var profiles = await User.Profiles.Scan();
-        await Parallel.ForEachAsync(profiles, Parallelism, DeleteProfile);
-
-        var imported = request.results.Select(ToImportedProfile).ToArray();
-        await Parallel.ForEachAsync(imported, Parallelism, ImportProfile);
-
-        return new PasswordProfiles() { results = imported };
-    }
-
-    async ValueTask DeleteProfile(Item<PasswordProfile> profile, CancellationToken _)
-        => await User.Profiles.Remove(profile.Id);
-
-    PasswordProfile ToImportedProfile(PasswordProfile profile)
-        => ToImportedProfile(profile, DateTime.Parse(profile.created, null, DateTimeStyles.RoundtripKind));
-
-    PasswordProfile ToImportedProfile(PasswordProfile profile, DateTime createdDate)
-        => profile with { id = Id.Generate(createdDate) };
-
-    async ValueTask ImportProfile(PasswordProfile profile, CancellationToken _)
-        => await User.Profiles.Save(new Item<PasswordProfile>
+        var existing = await User.Profiles.Scan();
+        foreach (var document in existing)
         {
-            Data = profile,
-            Id = profile.id
-        });
+            await User.Profiles.Remove(document.Id);
+        }
+        var profiles = request.results.OrderByDescending(profile => profile.created).ToArray();
+        for (var i = profiles.Length; i >= 0; i -= 500)
+        {
+            await User.Profiles.Save(new()
+            {
+                Data = new()
+                {
+                    Profiles = profiles[Math.Max(0, i - 500)..i]
+                },
+                Id = Id.Generate(DateTime.UtcNow)
+            });
+        }
+        return request;
+    }
 }

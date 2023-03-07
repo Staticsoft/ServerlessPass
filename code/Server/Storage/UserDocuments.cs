@@ -5,8 +5,8 @@ namespace Staticsoft.SharpPass.Server;
 
 public class UserDocuments
 {
-    public readonly Partition<PasswordProfile> Profiles;
+    public readonly Partition<PasswordProfilesDocument> Profiles;
 
     public UserDocuments(Partitions storage, Identity identity)
-        => Profiles = storage.GetFactory<PasswordProfile>().Get(identity.UserId);
+        => Profiles = storage.GetFactory<PasswordProfilesDocument>().Get(identity.UserId);
 }
