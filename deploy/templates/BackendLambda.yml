@@ -1,0 +1,487 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: SharpPass Lambda function and required resources.
+Resources:
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: "../../.local/Publish"
+      MemorySize: 1024
+      Handler: Server.AWS::Staticsoft.SharpPass.Server.AWS.LambdaEntryPoint::FunctionHandlerAsync
+      Role:
+        Fn::ImportValue: SharpPassLambdaFunctionRoleArn
+      Timeout: 30
+      Runtime: dotnet6
+      Environment:
+        Variables:
+          CognitoClientAppId:
+            Fn::ImportValue: SharpPassUserPoolClientId
+          CognitoUserPoolId:
+            Fn::ImportValue: SharpPassUserPoolId
+          DynamoDbTableNamePrefix: SharpPass
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      FunctionName:
+        Ref: LambdaFunction
+      SourceArn:
+        Fn::Sub:
+        - arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiId}/*/*/*
+        - ApiId:
+            Fn::ImportValue: SharpPassApiGatewayId
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+    - OptionsMethod
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      StageName: initial
+  ApiGatewayStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      DeploymentId:
+        Ref: ApiGatewayDeployment
+      StageName: prod
+      MethodSettings:
+      - HttpMethod: "*"
+        ResourcePath: "/*"
+        LoggingLevel: 'OFF'
+  ApiGatewayDomainMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      DomainName:
+        Fn::ImportValue: SharpPassApiGatewayDomainName
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      Stage:
+        Ref: ApiGatewayStage
+  OptionsResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Fn::ImportValue: SharpPassApiGatewayRootResourceId
+      PathPart: "{proxy+}"
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+  AuthResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ParentId:
+        Fn::ImportValue: SharpPassApiGatewayRootResourceId
+      PathPart: auth
+  AuthUsersResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ParentId:
+        Ref: AuthResource
+      PathPart: users
+  AuthJwtResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ParentId:
+        Ref: AuthResource
+      PathPart: jwt
+  AuthJwtCreateResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ParentId:
+        Ref: AuthJwtResource
+      PathPart: create
+  AuthJwtRefreshResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ParentId:
+        Ref: AuthJwtResource
+      PathPart: refresh
+  PasswordsResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ParentId:
+        Fn::ImportValue: SharpPassApiGatewayRootResourceId
+      PathPart: passwords
+  PasswordsListResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ParentId:
+        Ref: PasswordsResource
+      PathPart: list
+  PasswordsCreateResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ParentId:
+        Ref: PasswordsResource
+      PathPart: create
+  PasswordsImportResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ParentId:
+        Ref: PasswordsResource
+      PathPart: import
+  PasswordsUpdateResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ParentId:
+        Ref: PasswordsResource
+      PathPart: update
+  PasswordsUpdateIdResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ParentId:
+        Ref: PasswordsUpdateResource
+      PathPart: "{id}"
+  PasswordsDeleteResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ParentId:
+        Ref: PasswordsResource
+      PathPart: delete
+  PasswordsDeleteIdResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ParentId:
+        Ref: PasswordsDeleteResource
+      PathPart: "{id}"
+  PasswordsIdResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ParentId:
+        Ref: PasswordsResource
+      PathPart: "{id}"
+  OptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ResourceId:
+        Ref: OptionsResource
+      HttpMethod: OPTIONS
+      AuthorizationType: None
+      ApiKeyRequired: false
+      Integration:
+        Type: MOCK
+        IntegrationResponses:
+        - ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: "'chrome-extension://lcmbpoclaodbgkbjafnkbbinogcbnjih'"
+            method.response.header.Access-Control-Allow-Headers:
+              Fn::Sub:
+              - "'${Headers}'"
+              - Headers:  
+                  Fn::Join:
+                  - ","
+                  - - "x-requested-with"
+                    - "content-type"
+                    - "accept"
+                    - "origin"
+                    - "authorization"
+                    - "x-csrftoken"
+                    - "user-agent"
+                    - "accept-encoding"
+                    - "cache-control"
+            method.response.header.Access-Control-Allow-Methods:
+              Fn::Sub:
+              - "'${Methods}'"
+              - Methods:
+                  Fn::Join:
+                  - ","
+                  - - "GET"
+                    - "POST"
+                    - "PUT"
+                    - "DELETE"
+                    - "OPTIONS"
+          StatusCode: 200
+        PassthroughBehavior: WHEN_NO_TEMPLATES
+        RequestTemplates:
+          "application/json": "{\"statusCode\": 200}"
+      MethodResponses:
+      - StatusCode: 200
+        ResponseParameters:
+          method.response.header.Access-Control-Allow-Origin: true
+          method.response.header.Access-Control-Allow-Headers: true
+          method.response.header.Access-Control-Allow-Methods: true
+  PostAuthUsersMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ResourceId:
+        Ref: AuthUsersResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri:
+          Fn::Sub:
+          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations"
+          - LambdaFunctionArn:
+              Fn::GetAtt:
+              - LambdaFunction
+              - Arn
+  PostAuthJwtCreateMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ResourceId:
+        Ref: AuthJwtCreateResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri:
+          Fn::Sub:
+          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations"
+          - LambdaFunctionArn:
+              Fn::GetAtt:
+              - LambdaFunction
+              - Arn
+  PostAuthJwtRefreshMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ResourceId:
+        Ref: AuthJwtRefreshResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri:
+          Fn::Sub:
+          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations"
+          - LambdaFunctionArn:
+              Fn::GetAtt:
+              - LambdaFunction
+              - Arn
+  PostPasswordsListMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ResourceId:
+        Ref: PasswordsListResource
+      HttpMethod: POST
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId:
+        Fn::ImportValue: SharpPassAuthorizerId
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri:
+          Fn::Sub:
+          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations"
+          - LambdaFunctionArn:
+              Fn::GetAtt:
+              - LambdaFunction
+              - Arn
+  PostPasswordsCreateMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ResourceId:
+        Ref: PasswordsCreateResource
+      HttpMethod: POST
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId:
+        Fn::ImportValue: SharpPassAuthorizerId
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri:
+          Fn::Sub:
+          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations"
+          - LambdaFunctionArn:
+              Fn::GetAtt:
+              - LambdaFunction
+              - Arn
+  PostPasswordsImportMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ResourceId:
+        Ref: PasswordsImportResource
+      HttpMethod: POST
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId:
+        Fn::ImportValue: SharpPassAuthorizerId
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri:
+          Fn::Sub:
+          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations"
+          - LambdaFunctionArn:
+              Fn::GetAtt:
+              - LambdaFunction
+              - Arn
+  PostPasswordsUpdateIdMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ResourceId:
+        Ref: PasswordsUpdateIdResource
+      HttpMethod: POST
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId:
+        Fn::ImportValue: SharpPassAuthorizerId
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri:
+          Fn::Sub:
+          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations"
+          - LambdaFunctionArn:
+              Fn::GetAtt:
+              - LambdaFunction
+              - Arn
+  PostPasswordsDeleteIdMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ResourceId:
+        Ref: PasswordsDeleteIdResource
+      HttpMethod: POST
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId:
+        Fn::ImportValue: SharpPassAuthorizerId
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri:
+          Fn::Sub:
+          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations"
+          - LambdaFunctionArn:
+              Fn::GetAtt:
+              - LambdaFunction
+              - Arn
+  GetPasswordsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ResourceId:
+        Ref: PasswordsResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: HTTP_PROXY
+        IntegrationHttpMethod: POST
+        Uri:
+          Fn::Sub:
+          - "https://${ApiGatewayDomain}/passwords/list/"
+          - ApiGatewayDomain:
+              Fn::ImportValue: SharpPassApiGatewayDomainName
+  PostPasswordsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ResourceId:
+        Ref: PasswordsResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: HTTP_PROXY
+        IntegrationHttpMethod: POST
+        Uri:
+          Fn::Sub:
+          - "https://${ApiGatewayDomain}/passwords/create/"
+          - ApiGatewayDomain:
+              Fn::ImportValue: SharpPassApiGatewayDomainName
+  PutPasswordsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ResourceId:
+        Ref: PasswordsResource
+      HttpMethod: PUT
+      AuthorizationType: NONE
+      Integration:
+        Type: HTTP_PROXY
+        IntegrationHttpMethod: POST
+        Uri:
+          Fn::Sub:
+          - "https://${ApiGatewayDomain}/passwords/import/"
+          - ApiGatewayDomain:
+              Fn::ImportValue: SharpPassApiGatewayDomainName
+  PutPasswordsIdMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ResourceId:
+        Ref: PasswordsIdResource
+      HttpMethod: PUT
+      AuthorizationType: NONE
+      RequestParameters:
+        method.request.path.id: true
+      Integration:
+        Type: HTTP_PROXY
+        IntegrationHttpMethod: POST
+        RequestParameters:
+          integration.request.path.id: method.request.path.id
+        Uri:
+          Fn::Sub:
+          - "https://${ApiGatewayDomain}/passwords/update/{id}"
+          - ApiGatewayDomain:
+              Fn::ImportValue: SharpPassApiGatewayDomainName
+  DeletePasswordsIdMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId:
+        Fn::ImportValue: SharpPassApiGatewayId
+      ResourceId:
+        Ref: PasswordsIdResource
+      HttpMethod: DELETE
+      AuthorizationType: NONE
+      RequestParameters:
+        method.request.path.id: true
+      Integration:
+        Type: HTTP_PROXY
+        IntegrationHttpMethod: POST
+        RequestParameters:
+          integration.request.path.id: method.request.path.id
+        Uri:
+          Fn::Sub:
+          - "https://${ApiGatewayDomain}/passwords/delete/{id}"
+          - ApiGatewayDomain:
+              Fn::ImportValue: SharpPassApiGatewayDomainName
