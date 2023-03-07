@@ -11,11 +11,13 @@ jobs:
       with:
         dotnet-version: | 
           6.0.x
+    - name: Checkout repository
+      uses: actions/checkout@v2
     - name: Build and zip backend
       run: |
         dotnet \
           publish \
-          ./code/Server.AWS/Server.AWS.csproj \
+          code/Server.AWS/Server.AWS.csproj \
           -c Release \
           -o .local/Publish;
         zip -r .local/Publish .local/Backend.zip;
