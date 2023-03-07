@@ -4,15 +4,10 @@ function Publish-Code {
     & dotnet @(
         'publish'
         "$PSScriptRoot/../code/Server.AWS/Server.AWS.csproj"
-        '/p:GenerateRuntimeConfigurationFiles=true'
-        '/p:PublishReadyToRun=true'
         '-c'
         'Release'
         '-o'
         "$Local/Publish"
-        '-r'
-        'linux-x64'
-        '--no-self-contained'
     )
 }
 
