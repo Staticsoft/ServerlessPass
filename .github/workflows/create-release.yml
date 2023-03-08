@@ -17,7 +17,7 @@ jobs:
       run: |
         dotnet \
           publish \
-          code/Server.AWS/Server.AWS.csproj \
+          code/backend/Server.AWS/Server.AWS.csproj \
           -c Release \
           -o .local/Publish;
         zip -r .local/Backend.zip .local/Publish deploy/templates/BackendLambda.yml;
