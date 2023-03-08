@@ -14,4 +14,4 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
     - name: Run tests
-      run: dotnet test code/SharpPass.sln
+      run: dotnet test code/backend/SharpPass.sln

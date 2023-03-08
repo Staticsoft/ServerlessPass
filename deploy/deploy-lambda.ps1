@@ -3,7 +3,7 @@ $Local = "$PSScriptRoot/../.local"
 function Publish-Code {
     & dotnet @(
         'publish'
-        "$PSScriptRoot/../code/Server.AWS/Server.AWS.csproj"
+        "$PSScriptRoot/../code/backend/Server.AWS/Server.AWS.csproj"
         '-c'
         'Release'
         '-o'
