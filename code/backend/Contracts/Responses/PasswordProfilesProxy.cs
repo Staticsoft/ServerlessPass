@@ -1,6 +1,3 @@
 ﻿namespace Staticsoft.SharpPass.Contracts;
 
-public class PasswordProfilesProxy : PasswordProfiles
-{
-
-}
+public class PasswordProfilesProxy : PasswordProfiles { }
