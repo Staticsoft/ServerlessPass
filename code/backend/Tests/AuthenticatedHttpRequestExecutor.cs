@@ -14,5 +14,5 @@ public class AuthenticatedHttpRequestExecutor : HttpRequestExecutor
     public Task<HttpResponse> Execute(HttpRequest request)
         => Token == string.Empty
         ? Executor.Execute(request)
-        : Executor.Execute(request.WithHeader("Authorization", $"JWT {Token}"));
+        : Executor.Execute(request.WithHeader("Authorization", $"Bearer {Token}"));
 }

@@ -1,0 +1,40 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "ApplicationServer",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build application server",
+            "program": "${workspaceFolder}/code/backend/Server.Local/bin/Debug/net6.0/Server.Local.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/code/backend/Server.Local",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "http://localhost:5001"
+            }
+        },
+        {
+            "name": "AuthenticationServer",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build authentication server",
+            "program": "${workspaceFolder}/code/backend/Server.Users.Fake/bin/Debug/net6.0/Server.Users.Fake.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/code/backend/Server.Users.Fake",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "http://localhost:5002"
+            }
+        }
+    ],
+    "compounds": [
+        {
+          "name": "Servers",
+          "configurations": ["ApplicationServer", "AuthenticationServer"],
+          "stopAll": true
+        }
+    ]
+}
