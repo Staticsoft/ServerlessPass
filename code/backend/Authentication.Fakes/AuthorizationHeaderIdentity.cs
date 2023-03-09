@@ -10,7 +10,15 @@ public class AuthorizationHeaderIdentity : Identity
         => Accessor = accessor;
 
     public string UserId
-        => Context.Request.Headers["Authorization"].Single().Replace("JWT ", string.Empty);
+        => GetUserId();
+
+    string GetUserId()
+    {
+        var value = Context.Request.Headers["Authorization"].Single();
+        if (!value.StartsWith("Bearer ")) throw new ArgumentException();
+
+        return value.Replace("Bearer ", string.Empty);
+    }
 
     HttpContext Context
         => Accessor.HttpContext ?? throw UnexpectedNullException(nameof(Context));

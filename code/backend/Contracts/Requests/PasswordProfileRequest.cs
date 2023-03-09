@@ -11,4 +11,7 @@ public record PasswordProfileRequest
     public int length { get; init; }
     public int counter { get; init; }
     public int version { get; init; }
+
+    public bool digits
+        => numbers;
 }
