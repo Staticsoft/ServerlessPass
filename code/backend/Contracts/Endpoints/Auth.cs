@@ -1,7 +1,7 @@
 ﻿using Staticsoft.Contracts.Abstractions;
 using Staticsoft.HttpCommunication.Abstractions;
 
-namespace Staticsoft.SharpPass.Contracts;
+namespace Staticsoft.ServerlessPass.Contracts;
 
 public class Auth
 {

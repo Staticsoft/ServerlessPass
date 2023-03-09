@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace Staticsoft.SharpPass.Authentication.Fakes;
+namespace Staticsoft.ServerlessPass.Authentication.Fakes;
 
 public class AuthorizationHeaderIdentity : Identity
 {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace Staticsoft.SharpPass.Server.AWS;
+namespace Staticsoft.ServerlessPass.Server.AWS;
 
 public class Program
 {

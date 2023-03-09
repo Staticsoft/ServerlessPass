@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Staticsoft.HttpCommunication.Abstractions;
 
-namespace Staticsoft.SharpPass.Tests;
+namespace Staticsoft.ServerlessPass.Tests;
 
 public class PasswordScenarioBase : UserScenarioBase, IAsyncLifetime
 {

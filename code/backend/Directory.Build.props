@@ -2,6 +2,6 @@
 <Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<PropertyGroup>
 		<Company>Staticsoft</Company>
-		<Product>SharpPass</Product>
+		<Product>ServerlessPass</Product>
 	</PropertyGroup>
 </Project>

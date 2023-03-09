@@ -1,4 +1,4 @@
-﻿namespace Staticsoft.SharpPass.Authentication;
+﻿namespace Staticsoft.ServerlessPass.Authentication;
 
 public interface Identity
 {

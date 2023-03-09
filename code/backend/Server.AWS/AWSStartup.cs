@@ -5,14 +5,14 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Staticsoft.PartitionedStorage.Abstractions;
 using Staticsoft.PartitionedStorage.AWS;
-using Staticsoft.SharpPass.Authentication;
-using Staticsoft.SharpPass.Authentication.ASP;
-using Staticsoft.SharpPass.Services;
-using Staticsoft.SharpPass.Users;
-using Staticsoft.SharpPass.Users.Cognito;
+using Staticsoft.ServerlessPass.Authentication;
+using Staticsoft.ServerlessPass.Authentication.ASP;
+using Staticsoft.ServerlessPass.Services;
+using Staticsoft.ServerlessPass.Users;
+using Staticsoft.ServerlessPass.Users.Cognito;
 using System;
 
-namespace Staticsoft.SharpPass.Server.AWS;
+namespace Staticsoft.ServerlessPass.Server.AWS;
 
 public class AWSStartup : Startup
 {

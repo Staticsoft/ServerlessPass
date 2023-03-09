@@ -1,7 +1,7 @@
 ﻿using Staticsoft.Contracts.Abstractions;
-using Staticsoft.SharpPass.Contracts;
+using Staticsoft.ServerlessPass.Contracts;
 
-namespace Staticsoft.SharpPass.Tests;
+namespace Staticsoft.ServerlessPass.Tests;
 
 public class PasswordsTests : PasswordScenarioBase
 {

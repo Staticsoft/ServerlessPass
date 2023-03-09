@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Staticsoft.SharpPass.Server;
+using Staticsoft.ServerlessPass.Server;
 
-namespace Staticsoft.SharpPass.Tests;
+namespace Staticsoft.ServerlessPass.Tests;
 
 public class PasswordProfilesIdGeneratorServices : UnitServicesBase
 {

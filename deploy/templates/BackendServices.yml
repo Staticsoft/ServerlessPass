@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: SharpPass services used by the backend.
+Description: ServerlessPass services used by the backend.
 Parameters:
   ArtifactsBucketName:
     Description: Bucket to store artifacts for the application
@@ -43,7 +43,7 @@ Resources:
       - email
       UsernameConfiguration:
         CaseSensitive: false
-      UserPoolName: "SharpPassUsers"
+      UserPoolName: "ServerlessPassUsers"
       VerificationMessageTemplate:
         DefaultEmailOption: CONFIRM_WITH_LINK
         EmailMessageByLink: Please click the link below to verify your email address.
@@ -81,11 +81,11 @@ Resources:
         KeyType: HASH
       - AttributeName: SortKey
         KeyType: RANGE
-      TableName: SharpPassPartitionedStorage
+      TableName: ServerlessPassPartitionedStorage
   LambdaFunctionRolePolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      ManagedPolicyName: SharpPassLambdaPolicy
+      ManagedPolicyName: ServerlessPassLambdaPolicy
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -150,12 +150,12 @@ Resources:
   CodeBuildLogs:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: "SharpPassBackendCodeBuildLogs"
+      LogGroupName: "ServerlessPassBackendCodeBuildLogs"
       RetentionInDays: 90
   CodeBuildPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      ManagedPolicyName: SharpPassBackendCodeBuildPolicy
+      ManagedPolicyName: ServerlessPassBackendCodeBuildPolicy
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -196,15 +196,15 @@ Resources:
           - lambda:AddPermission
           - lambda:RemovePermission
           Resource:
-            Fn::Sub: "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:SharpPassLambda*"
+            Fn::Sub: "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:ServerlessPassLambda*"
         - Effect: Allow
           Action:
           - cloudformation:CreateStack
           - cloudformation:UpdateStack
           - cloudformation:DescribeStacks
           Resource:
-          - Fn::Sub: "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/SharpPassLambda"
-          - Fn::Sub: "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/SharpPassLambda/*"
+          - Fn::Sub: "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/ServerlessPassLambda"
+          - Fn::Sub: "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/ServerlessPassLambda/*"
         - Effect: Allow
           Action:
           - apigateway:GET
@@ -235,11 +235,11 @@ Resources:
   ApiGateway:
     Type: AWS::ApiGateway::RestApi
     Properties:
-      Name: SharpPassApi
+      Name: ServerlessPassApi
   Authorizer:
     Type: AWS::ApiGateway::Authorizer
     Properties:
-      Name: SharpPassAuthorizer
+      Name: ServerlessPassAuthorizer
       RestApiId:
         Ref: ApiGateway
       Type: COGNITO_USER_POOLS
@@ -280,42 +280,42 @@ Outputs:
       - LambdaFunctionRole
       - Arn
     Export:
-      Name: SharpPassLambdaFunctionRoleArn
+      Name: ServerlessPassLambdaFunctionRoleArn
   UserPoolId:
     Value:
       Ref: UserPool
     Export:
-      Name: SharpPassUserPoolId
+      Name: ServerlessPassUserPoolId
   UserPoolClientId:
     Value:
       Ref: UserPoolClient
     Export:
-      Name: SharpPassUserPoolClientId
+      Name: ServerlessPassUserPoolClientId
   ApiGatewayId:
     Value:
       Ref: ApiGateway
     Export:
-      Name: SharpPassApiGatewayId
+      Name: ServerlessPassApiGatewayId
   ApiGatewayRootResourceId:
     Value:
       Fn::GetAtt:
       - ApiGateway
       - RootResourceId
     Export:
-      Name: SharpPassApiGatewayRootResourceId
+      Name: ServerlessPassApiGatewayRootResourceId
   AuthorizerId:
     Value:
       Ref: Authorizer
     Export:
-      Name: SharpPassAuthorizerId
+      Name: ServerlessPassAuthorizerId
   DomainName:
     Value:
       Ref: ApiGatewayDomain
     Export:
       Name:
-        SharpPassApiGatewayDomainName
+        ServerlessPassApiGatewayDomainName
   ArtifactsBucketName:
     Value:
       Ref: ArtifactsBucket
     Export:
-      Name: SharpPassArtifactsBucketName
+      Name: ServerlessPassArtifactsBucketName

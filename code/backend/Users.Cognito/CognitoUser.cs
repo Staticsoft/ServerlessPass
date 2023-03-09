@@ -1,8 +1,8 @@
 ﻿using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
-using Staticsoft.SharpPass.Services;
+using Staticsoft.ServerlessPass.Services;
 
-namespace Staticsoft.SharpPass.Users.Cognito;
+namespace Staticsoft.ServerlessPass.Users.Cognito;
 
 public class CognitoUser : User, ServiceStatus
 {

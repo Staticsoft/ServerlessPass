@@ -1,4 +1,4 @@
-﻿namespace Staticsoft.SharpPass.Services;
+﻿namespace Staticsoft.ServerlessPass.Services;
 
 public interface ServiceStatus
 {

@@ -1,11 +1,11 @@
 using Staticsoft.PartitionedStorage.Abstractions;
 using Staticsoft.PartitionedStorage.Memory;
-using Staticsoft.SharpPass.Authentication;
-using Staticsoft.SharpPass.Authentication.Fakes;
-using Staticsoft.SharpPass.Users;
-using Staticsoft.SharpPass.Users.Fakes;
+using Staticsoft.ServerlessPass.Authentication;
+using Staticsoft.ServerlessPass.Authentication.Fakes;
+using Staticsoft.ServerlessPass.Users;
+using Staticsoft.ServerlessPass.Users.Fakes;
 
-namespace Staticsoft.SharpPass.Server.Local;
+namespace Staticsoft.ServerlessPass.Server.Local;
 
 public class LocalStartup : Startup
 {

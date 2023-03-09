@@ -1,4 +1,4 @@
-﻿namespace Staticsoft.SharpPass.Users.Fakes;
+﻿namespace Staticsoft.ServerlessPass.Users.Fakes;
 
 public class MemoryUser : User
 {
