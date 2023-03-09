@@ -2,10 +2,10 @@
 using Staticsoft.Contracts.ASP.Client;
 using Staticsoft.HttpCommunication.Json;
 using Staticsoft.Serialization.Net;
-using Staticsoft.SharpPass.Contracts;
-using Staticsoft.SharpPass.Server.Local;
+using Staticsoft.ServerlessPass.Contracts;
+using Staticsoft.ServerlessPass.Server.Local;
 
-namespace Staticsoft.SharpPass.Tests;
+namespace Staticsoft.ServerlessPass.Tests;
 
 public class TestBase : TestBase<IntegrationServicesBase<LocalStartup>>
 {

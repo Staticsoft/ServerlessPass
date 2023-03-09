@@ -1,6 +1,6 @@
-﻿using Staticsoft.SharpPass.Users;
+﻿using Staticsoft.ServerlessPass.Users;
 
-namespace Staticsoft.SharpPass.Tests;
+namespace Staticsoft.ServerlessPass.Tests;
 
 public class JwtTests : UserScenarioBase
 {

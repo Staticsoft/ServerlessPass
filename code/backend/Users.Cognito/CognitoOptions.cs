@@ -1,4 +1,4 @@
-﻿namespace Staticsoft.SharpPass.Users.Cognito;
+﻿namespace Staticsoft.ServerlessPass.Users.Cognito;
 
 public class CognitoOptions
 {

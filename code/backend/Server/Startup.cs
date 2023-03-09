@@ -1,11 +1,11 @@
 using Staticsoft.Contracts.ASP.Server;
 using Staticsoft.PartitionedStorage.Abstractions;
 using Staticsoft.Serialization.Net;
-using Staticsoft.SharpPass.Authentication;
-using Staticsoft.SharpPass.Services;
+using Staticsoft.ServerlessPass.Authentication;
+using Staticsoft.ServerlessPass.Services;
 using System.Reflection;
 
-namespace Staticsoft.SharpPass.Server;
+namespace Staticsoft.ServerlessPass.Server;
 
 public abstract class Startup
 {

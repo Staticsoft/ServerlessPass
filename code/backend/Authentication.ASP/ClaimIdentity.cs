@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace Staticsoft.SharpPass.Authentication.ASP;
+namespace Staticsoft.ServerlessPass.Authentication.ASP;
 
 public class ClaimIdentity : Identity
 {

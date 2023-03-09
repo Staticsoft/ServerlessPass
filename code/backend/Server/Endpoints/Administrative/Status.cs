@@ -1,6 +1,6 @@
-﻿using Staticsoft.SharpPass.Services;
+﻿using Staticsoft.ServerlessPass.Services;
 
-namespace Staticsoft.SharpPass.Server;
+namespace Staticsoft.ServerlessPass.Server;
 
 public class StatusEndpoint : HttpEndpoint<EmptyRequest, StatusResponse>
 {

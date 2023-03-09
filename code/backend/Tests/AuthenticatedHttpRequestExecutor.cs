@@ -1,6 +1,6 @@
 ﻿using Staticsoft.HttpCommunication.Abstractions;
 
-namespace Staticsoft.SharpPass.Tests;
+namespace Staticsoft.ServerlessPass.Tests;
 
 public class AuthenticatedHttpRequestExecutor : HttpRequestExecutor
 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Staticsoft.SharpPass.Tests;
+namespace Staticsoft.ServerlessPass.Tests;
 
 public class ScenarioBase : TestBase
 {

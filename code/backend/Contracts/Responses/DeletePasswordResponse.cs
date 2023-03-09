@@ -1,3 +1,3 @@
-﻿namespace Staticsoft.SharpPass.Contracts;
+﻿namespace Staticsoft.ServerlessPass.Contracts;
 
 public class DeletePasswordResponse { }

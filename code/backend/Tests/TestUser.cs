@@ -1,4 +1,4 @@
-﻿namespace Staticsoft.SharpPass.Tests;
+﻿namespace Staticsoft.ServerlessPass.Tests;
 
 public class TestUser
 {

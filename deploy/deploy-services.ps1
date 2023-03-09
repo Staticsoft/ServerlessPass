@@ -13,7 +13,7 @@ function Find-Stack {
         'cloudformation'
         'describe-stacks'
         '--stack-name'
-        'SharpPassBackendServices'
+        'ServerlessPassBackendServices'
     ) 2>$null
 }
 
@@ -34,7 +34,7 @@ function Write-Stack {
         'cloudformation'
         $command
         '--stack-name'
-        'SharpPassBackendServices'
+        'ServerlessPassBackendServices'
         '--template-body'
         "file://$PSScriptRoot/templates/BackendServices.yml"
         '--parameters'

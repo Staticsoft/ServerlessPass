@@ -1,23 +1,23 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: SharpPass Lambda function and required resources.
+Description: ServerlessPass Lambda function and required resources.
 Resources:
   LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
       Code: "../../.local/Publish"
       MemorySize: 1024
-      Handler: Server.AWS::Staticsoft.SharpPass.Server.AWS.LambdaEntryPoint::FunctionHandlerAsync
+      Handler: Server.AWS::Staticsoft.ServerlessPass.Server.AWS.LambdaEntryPoint::FunctionHandlerAsync
       Role:
-        Fn::ImportValue: SharpPassLambdaFunctionRoleArn
+        Fn::ImportValue: ServerlessPassLambdaFunctionRoleArn
       Timeout: 30
       Runtime: dotnet6
       Environment:
         Variables:
           CognitoClientAppId:
-            Fn::ImportValue: SharpPassUserPoolClientId
+            Fn::ImportValue: ServerlessPassUserPoolClientId
           CognitoUserPoolId:
-            Fn::ImportValue: SharpPassUserPoolId
-          DynamoDbTableNamePrefix: SharpPass
+            Fn::ImportValue: ServerlessPassUserPoolId
+          DynamoDbTableNamePrefix: ServerlessPass
   LambdaApiGatewayPermission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -29,7 +29,7 @@ Resources:
         Fn::Sub:
         - arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiId}/*/*/*
         - ApiId:
-            Fn::ImportValue: SharpPassApiGatewayId
+            Fn::ImportValue: ServerlessPassApiGatewayId
   LambdaCloudWatchPermission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -62,13 +62,13 @@ Resources:
     - OptionsMethod
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       StageName: initial
   ApiGatewayStage:
     Type: AWS::ApiGateway::Stage
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       DeploymentId:
         Ref: ApiGatewayDeployment
       StageName: prod
@@ -80,32 +80,32 @@ Resources:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
       DomainName:
-        Fn::ImportValue: SharpPassApiGatewayDomainName
+        Fn::ImportValue: ServerlessPassApiGatewayDomainName
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       Stage:
         Ref: ApiGatewayStage
   OptionsResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       ParentId:
-        Fn::ImportValue: SharpPassApiGatewayRootResourceId
+        Fn::ImportValue: ServerlessPassApiGatewayRootResourceId
       PathPart: "{proxy+}"
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
   AuthResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ParentId:
-        Fn::ImportValue: SharpPassApiGatewayRootResourceId
+        Fn::ImportValue: ServerlessPassApiGatewayRootResourceId
       PathPart: auth
   AuthUsersResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ParentId:
         Ref: AuthResource
       PathPart: users
@@ -113,7 +113,7 @@ Resources:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ParentId:
         Ref: AuthResource
       PathPart: jwt
@@ -121,7 +121,7 @@ Resources:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ParentId:
         Ref: AuthJwtResource
       PathPart: create
@@ -129,7 +129,7 @@ Resources:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ParentId:
         Ref: AuthJwtResource
       PathPart: refresh
@@ -137,15 +137,15 @@ Resources:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ParentId:
-        Fn::ImportValue: SharpPassApiGatewayRootResourceId
+        Fn::ImportValue: ServerlessPassApiGatewayRootResourceId
       PathPart: passwords
   PasswordsListResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ParentId:
         Ref: PasswordsResource
       PathPart: list
@@ -153,7 +153,7 @@ Resources:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ParentId:
         Ref: PasswordsResource
       PathPart: create
@@ -161,7 +161,7 @@ Resources:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ParentId:
         Ref: PasswordsResource
       PathPart: import
@@ -169,7 +169,7 @@ Resources:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ParentId:
         Ref: PasswordsResource
       PathPart: update
@@ -177,7 +177,7 @@ Resources:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ParentId:
         Ref: PasswordsUpdateResource
       PathPart: "{id}"
@@ -185,7 +185,7 @@ Resources:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ParentId:
         Ref: PasswordsResource
       PathPart: delete
@@ -193,7 +193,7 @@ Resources:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ParentId:
         Ref: PasswordsDeleteResource
       PathPart: "{id}"
@@ -201,7 +201,7 @@ Resources:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ParentId:
         Ref: PasswordsResource
       PathPart: "{id}"
@@ -209,7 +209,7 @@ Resources:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ResourceId:
         Ref: OptionsResource
       HttpMethod: OPTIONS
@@ -260,7 +260,7 @@ Resources:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ResourceId:
         Ref: AuthUsersResource
       HttpMethod: POST
@@ -279,7 +279,7 @@ Resources:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ResourceId:
         Ref: AuthJwtCreateResource
       HttpMethod: POST
@@ -298,7 +298,7 @@ Resources:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ResourceId:
         Ref: AuthJwtRefreshResource
       HttpMethod: POST
@@ -317,13 +317,13 @@ Resources:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ResourceId:
         Ref: PasswordsListResource
       HttpMethod: POST
       AuthorizationType: COGNITO_USER_POOLS
       AuthorizerId:
-        Fn::ImportValue: SharpPassAuthorizerId
+        Fn::ImportValue: ServerlessPassAuthorizerId
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
@@ -338,13 +338,13 @@ Resources:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ResourceId:
         Ref: PasswordsCreateResource
       HttpMethod: POST
       AuthorizationType: COGNITO_USER_POOLS
       AuthorizerId:
-        Fn::ImportValue: SharpPassAuthorizerId
+        Fn::ImportValue: ServerlessPassAuthorizerId
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
@@ -359,13 +359,13 @@ Resources:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ResourceId:
         Ref: PasswordsImportResource
       HttpMethod: POST
       AuthorizationType: COGNITO_USER_POOLS
       AuthorizerId:
-        Fn::ImportValue: SharpPassAuthorizerId
+        Fn::ImportValue: ServerlessPassAuthorizerId
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
@@ -380,13 +380,13 @@ Resources:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ResourceId:
         Ref: PasswordsUpdateIdResource
       HttpMethod: POST
       AuthorizationType: COGNITO_USER_POOLS
       AuthorizerId:
-        Fn::ImportValue: SharpPassAuthorizerId
+        Fn::ImportValue: ServerlessPassAuthorizerId
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
@@ -401,13 +401,13 @@ Resources:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ResourceId:
         Ref: PasswordsDeleteIdResource
       HttpMethod: POST
       AuthorizationType: COGNITO_USER_POOLS
       AuthorizerId:
-        Fn::ImportValue: SharpPassAuthorizerId
+        Fn::ImportValue: ServerlessPassAuthorizerId
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
@@ -422,7 +422,7 @@ Resources:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ResourceId:
         Ref: PasswordsResource
       HttpMethod: GET
@@ -434,12 +434,12 @@ Resources:
           Fn::Sub:
           - "https://${ApiGatewayDomain}/passwords/list/"
           - ApiGatewayDomain:
-              Fn::ImportValue: SharpPassApiGatewayDomainName
+              Fn::ImportValue: ServerlessPassApiGatewayDomainName
   PostPasswordsMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ResourceId:
         Ref: PasswordsResource
       HttpMethod: POST
@@ -451,12 +451,12 @@ Resources:
           Fn::Sub:
           - "https://${ApiGatewayDomain}/passwords/create/"
           - ApiGatewayDomain:
-              Fn::ImportValue: SharpPassApiGatewayDomainName
+              Fn::ImportValue: ServerlessPassApiGatewayDomainName
   PutPasswordsMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ResourceId:
         Ref: PasswordsResource
       HttpMethod: PUT
@@ -468,12 +468,12 @@ Resources:
           Fn::Sub:
           - "https://${ApiGatewayDomain}/passwords/import/"
           - ApiGatewayDomain:
-              Fn::ImportValue: SharpPassApiGatewayDomainName
+              Fn::ImportValue: ServerlessPassApiGatewayDomainName
   PutPasswordsIdMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ResourceId:
         Ref: PasswordsIdResource
       HttpMethod: PUT
@@ -489,12 +489,12 @@ Resources:
           Fn::Sub:
           - "https://${ApiGatewayDomain}/passwords/update/{id}"
           - ApiGatewayDomain:
-              Fn::ImportValue: SharpPassApiGatewayDomainName
+              Fn::ImportValue: ServerlessPassApiGatewayDomainName
   DeletePasswordsIdMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: SharpPassApiGatewayId
+        Fn::ImportValue: ServerlessPassApiGatewayId
       ResourceId:
         Ref: PasswordsIdResource
       HttpMethod: DELETE
@@ -510,4 +510,4 @@ Resources:
           Fn::Sub:
           - "https://${ApiGatewayDomain}/passwords/delete/{id}"
           - ApiGatewayDomain:
-              Fn::ImportValue: SharpPassApiGatewayDomainName
+              Fn::ImportValue: ServerlessPassApiGatewayDomainName

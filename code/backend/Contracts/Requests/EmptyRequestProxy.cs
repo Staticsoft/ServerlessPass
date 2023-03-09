@@ -1,5 +1,5 @@
 ﻿using Staticsoft.Contracts.Abstractions;
 
-namespace Staticsoft.SharpPass.Contracts;
+namespace Staticsoft.ServerlessPass.Contracts;
 
 public class EmptyRequestProxy : EmptyRequest { }

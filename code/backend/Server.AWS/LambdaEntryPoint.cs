@@ -5,9 +5,9 @@ using Amazon.Lambda.Core;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Hosting;
-using Staticsoft.SharpPass.Authentication.ASP;
+using Staticsoft.ServerlessPass.Authentication.ASP;
 
-namespace Staticsoft.SharpPass.Server.AWS;
+namespace Staticsoft.ServerlessPass.Server.AWS;
 
 public class LambdaEntryPoint : APIGatewayProxyFunction
 {

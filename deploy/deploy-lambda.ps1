@@ -12,7 +12,7 @@ function Publish-Code {
 }
 
 function Publish-Template {
-    $bucketName = Get-ExportValue -Name 'SharpPassArtifactsBucketName'
+    $bucketName = Get-ExportValue -Name 'ServerlessPassArtifactsBucketName'
 
     & aws @(
         'cloudformation'
@@ -56,7 +56,7 @@ function Find-Stack {
         'cloudformation'
         'describe-stacks'
         '--stack-name'
-        'SharpPassLambda'
+        'ServerlessPassLambda'
     ) 2>$null
 }
 
@@ -79,7 +79,7 @@ function Write-Stack {
         'cloudformation'
         $command
         '--stack-name'
-        'SharpPassLambda'
+        'ServerlessPassLambda'
         '--template-body'
         "file://$Local/BackendLambda.yml"
     )
@@ -96,12 +96,12 @@ function Wait-Stack {
         'wait'
         $condition
         '--stack-name'
-        'SharpPassLambda'
+        'ServerlessPassLambda'
     )
 }
 
 function New-Deployment {
-    $apiId = Get-ExportValue -Name 'SharpPassApiGatewayId'
+    $apiId = Get-ExportValue -Name 'ServerlessPassApiGatewayId'
 
     & aws @(
         'apigateway'

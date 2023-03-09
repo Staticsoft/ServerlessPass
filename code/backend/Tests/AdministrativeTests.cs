@@ -1,6 +1,6 @@
 ﻿using Staticsoft.Contracts.Abstractions;
 
-namespace Staticsoft.SharpPass.Tests;
+namespace Staticsoft.ServerlessPass.Tests;
 
 public class AdministrativeTests : TestBase
 {

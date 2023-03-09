@@ -1,3 +1,3 @@
-﻿namespace Staticsoft.SharpPass.Users;
+﻿namespace Staticsoft.ServerlessPass.Users;
 
 public class LogInException : Exception { }

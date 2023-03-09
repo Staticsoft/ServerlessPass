@@ -1,4 +1,4 @@
-﻿namespace Staticsoft.SharpPass.Server.Local;
+﻿namespace Staticsoft.ServerlessPass.Server.Local;
 
 public class Program
 {

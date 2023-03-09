@@ -1,4 +1,4 @@
-﻿namespace Staticsoft.SharpPass.Authentication.ASP;
+﻿namespace Staticsoft.ServerlessPass.Authentication.ASP;
 
 public class Claims
 {

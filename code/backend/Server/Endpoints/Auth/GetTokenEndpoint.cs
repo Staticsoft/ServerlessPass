@@ -1,6 +1,6 @@
-﻿using Staticsoft.SharpPass.Users;
+﻿using Staticsoft.ServerlessPass.Users;
 
-namespace Staticsoft.SharpPass.Server;
+namespace Staticsoft.ServerlessPass.Server;
 
 public class GetTokenEndpoint : HttpEndpoint<CreateJwtRequest, JwtResponse>
 {

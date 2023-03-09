@@ -1,6 +1,6 @@
 ﻿using Staticsoft.PartitionedStorage.Abstractions;
 
-namespace Staticsoft.SharpPass.Server;
+namespace Staticsoft.ServerlessPass.Server;
 
 public class ImportPasswordsEndpoint : HttpEndpoint<PasswordProfiles, PasswordProfiles>
 {
