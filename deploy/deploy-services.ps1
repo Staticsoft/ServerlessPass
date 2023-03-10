@@ -1,3 +1,10 @@
+param(
+    [string] $Stage = 'Dev'
+)
+
+$StackName = "ServerlessPassBackendServices$Stage"
+$ParametersFileName = "BackendServicesParameters$Stage.json"
+
 function Deploy-Stack {
     $stack = Find-Stack
     if ($null -eq $stack) {
@@ -13,7 +20,7 @@ function Find-Stack {
         'cloudformation'
         'describe-stacks'
         '--stack-name'
-        'ServerlessPassBackendServices'
+        $StackName
     ) 2>$null
 }
 
@@ -34,11 +41,11 @@ function Write-Stack {
         'cloudformation'
         $command
         '--stack-name'
-        'ServerlessPassBackendServices'
+        $StackName
         '--template-body'
         "file://$PSScriptRoot/templates/BackendServices.yml"
         '--parameters'
-        "file://$PSScriptRoot/../.local/deploy/BackendServicesParameters.json"
+        "file://$PSScriptRoot/../.local/deploy/$ParametersFileName"
         '--capabilities'
         'CAPABILITY_NAMED_IAM'
     )

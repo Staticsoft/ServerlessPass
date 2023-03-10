@@ -1,3 +1,8 @@
+param(
+    [string] $Stage = 'Dev'
+)
+
+$StackName = "ServerlessPassBackendLambda$Stage"
 $Local = "$PSScriptRoot/../.local"
 
 function Publish-Code {
@@ -12,7 +17,7 @@ function Publish-Code {
 }
 
 function Publish-Template {
-    $bucketName = Get-ExportValue -Name 'ServerlessPassArtifactsBucketName'
+    $bucketName = Get-ExportValue -Name "ServerlessPass${Stage}ArtifactsBucketName"
 
     & aws @(
         'cloudformation'
@@ -56,7 +61,7 @@ function Find-Stack {
         'cloudformation'
         'describe-stacks'
         '--stack-name'
-        'ServerlessPassLambda'
+        $StackName
     ) 2>$null
 }
 
@@ -79,9 +84,11 @@ function Write-Stack {
         'cloudformation'
         $command
         '--stack-name'
-        'ServerlessPassLambda'
+        $StackName
         '--template-body'
         "file://$Local/BackendLambda.yml"
+        '--parameters'
+        "ParameterKey=Stage,ParameterValue=$Stage"
     )
 }
 
@@ -96,12 +103,12 @@ function Wait-Stack {
         'wait'
         $condition
         '--stack-name'
-        'ServerlessPassLambda'
+        $StackName
     )
 }
 
 function New-Deployment {
-    $apiId = Get-ExportValue -Name 'ServerlessPassApiGatewayId'
+    $apiId = Get-ExportValue -Name "ServerlessPass${Stage}ApiGatewayId"
 
     & aws @(
         'apigateway'
@@ -109,7 +116,7 @@ function New-Deployment {
         '--rest-api-id'
         $apiId
         '--stage-name'
-        'prod'
+        $Stage
     )
 }
 
