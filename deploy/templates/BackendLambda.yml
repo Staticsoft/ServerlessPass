@@ -1,5 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: ServerlessPass Lambda function and required resources.
+Parameters:
+  Stage:
+    Description: Stage is used to deploy multiple instances of ServerlessPass
+    Type: String
 Resources:
   LambdaFunction:
     Type: AWS::Lambda::Function
@@ -8,53 +12,44 @@ Resources:
       MemorySize: 1024
       Handler: Server.AWS::Staticsoft.ServerlessPass.Server.AWS.LambdaEntryPoint::FunctionHandlerAsync
       Role:
-        Fn::ImportValue: ServerlessPassLambdaFunctionRoleArn
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}LambdaFunctionRoleArn"
       Timeout: 30
       Runtime: dotnet6
       Environment:
         Variables:
           CognitoClientAppId:
-            Fn::ImportValue: ServerlessPassUserPoolClientId
+            Fn::ImportValue: !Sub "ServerlessPass${Stage}UserPoolClientId"
           CognitoUserPoolId:
-            Fn::ImportValue: ServerlessPassUserPoolId
-          DynamoDbTableNamePrefix: ServerlessPass
+            Fn::ImportValue: !Sub "ServerlessPass${Stage}UserPoolId"
+          DynamoDbTableNamePrefix: !Sub "ServerlessPass${Stage}"
   LambdaApiGatewayPermission:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      FunctionName:
-        Ref: LambdaFunction
+      FunctionName: !Ref LambdaFunction
       SourceArn:
         Fn::Sub:
         - arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiId}/*/*/*
         - ApiId:
-            Fn::ImportValue: ServerlessPassApiGatewayId
+            Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
   LambdaCloudWatchPermission:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
       Principal: events.amazonaws.com
-      FunctionName:
-        Ref: LambdaFunction
-      SourceArn:
-        Fn::GetAtt:
-        - StatusTrigger
-        - Arn
+      FunctionName: !Ref LambdaFunction
+      SourceArn: !GetAtt StatusTrigger.Arn
   StatusTrigger:
     Type: AWS::Events::Rule
     Properties:
       Description: "Checks lambda's status every minute"
-      Name:
-        Fn::Sub: "${LambdaFunction}Status"
+      Name: !Sub "${LambdaFunction}Status"
       ScheduleExpression: "rate(1 minute)"
       State: "ENABLED"
       Targets:
       - Id: TriggerEveryMinute
-        Arn:
-          Fn::GetAtt:
-          - LambdaFunction
-          - Arn
+        Arn: !GetAtt LambdaFunction.Arn
         Input: '{"RequestContext":{"EventType":"CloudWatchTrigger","ResourcePath":"/Administrative/Status"}}'
   ApiGatewayDeployment:
     Type: AWS::ApiGateway::Deployment
@@ -62,16 +57,15 @@ Resources:
     - OptionsMethod
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
       StageName: initial
   ApiGatewayStage:
     Type: AWS::ApiGateway::Stage
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      DeploymentId:
-        Ref: ApiGatewayDeployment
-      StageName: prod
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      DeploymentId: !Ref ApiGatewayDeployment
+      StageName: !Ref Stage
       MethodSettings:
       - HttpMethod: "*"
         ResourcePath: "/*"
@@ -80,138 +74,124 @@ Resources:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
       DomainName:
-        Fn::ImportValue: ServerlessPassApiGatewayDomainName
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayDomainName"
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      Stage:
-        Ref: ApiGatewayStage
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      Stage: !Ref ApiGatewayStage
   OptionsResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       ParentId:
-        Fn::ImportValue: ServerlessPassApiGatewayRootResourceId
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayRootResourceId"
       PathPart: "{proxy+}"
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
   AuthResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
       ParentId:
-        Fn::ImportValue: ServerlessPassApiGatewayRootResourceId
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayRootResourceId"
       PathPart: auth
   AuthUsersResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ParentId:
-        Ref: AuthResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ParentId: !Ref AuthResource
       PathPart: users
   AuthJwtResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ParentId:
-        Ref: AuthResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ParentId: !Ref AuthResource
       PathPart: jwt
   AuthJwtCreateResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ParentId:
-        Ref: AuthJwtResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ParentId: !Ref AuthJwtResource
       PathPart: create
   AuthJwtRefreshResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ParentId:
-        Ref: AuthJwtResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ParentId: !Ref AuthJwtResource
       PathPart: refresh
   PasswordsResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
       ParentId:
-        Fn::ImportValue: ServerlessPassApiGatewayRootResourceId
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayRootResourceId"
       PathPart: passwords
   PasswordsListResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ParentId:
-        Ref: PasswordsResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ParentId: !Ref PasswordsResource
       PathPart: list
   PasswordsCreateResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ParentId:
-        Ref: PasswordsResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ParentId: !Ref PasswordsResource
       PathPart: create
   PasswordsImportResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ParentId:
-        Ref: PasswordsResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ParentId: !Ref PasswordsResource
       PathPart: import
   PasswordsUpdateResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ParentId:
-        Ref: PasswordsResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ParentId: !Ref PasswordsResource
       PathPart: update
   PasswordsUpdateIdResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ParentId:
-        Ref: PasswordsUpdateResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ParentId: !Ref PasswordsUpdateResource
       PathPart: "{id}"
   PasswordsDeleteResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ParentId:
-        Ref: PasswordsResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ParentId: !Ref PasswordsResource
       PathPart: delete
   PasswordsDeleteIdResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ParentId:
-        Ref: PasswordsDeleteResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ParentId: !Ref PasswordsDeleteResource
       PathPart: "{id}"
   PasswordsIdResource:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ParentId:
-        Ref: PasswordsResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ParentId: !Ref PasswordsResource
       PathPart: "{id}"
   OptionsMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ResourceId:
-        Ref: OptionsResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ResourceId: !Ref OptionsResource
       HttpMethod: OPTIONS
       AuthorizationType: None
       ApiKeyRequired: false
@@ -260,171 +240,114 @@ Resources:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ResourceId:
-        Ref: AuthUsersResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ResourceId: !Ref AuthUsersResource
       HttpMethod: POST
       AuthorizationType: NONE
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri:
-          Fn::Sub:
-          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations"
-          - LambdaFunctionArn:
-              Fn::GetAtt:
-              - LambdaFunction
-              - Arn
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations"
   PostAuthJwtCreateMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ResourceId:
-        Ref: AuthJwtCreateResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ResourceId: !Ref AuthJwtCreateResource
       HttpMethod: POST
       AuthorizationType: NONE
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri:
-          Fn::Sub:
-          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations"
-          - LambdaFunctionArn:
-              Fn::GetAtt:
-              - LambdaFunction
-              - Arn
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations"
   PostAuthJwtRefreshMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ResourceId:
-        Ref: AuthJwtRefreshResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ResourceId: !Ref AuthJwtRefreshResource
       HttpMethod: POST
       AuthorizationType: NONE
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri:
-          Fn::Sub:
-          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations"
-          - LambdaFunctionArn:
-              Fn::GetAtt:
-              - LambdaFunction
-              - Arn
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations"
   PostPasswordsListMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ResourceId:
-        Ref: PasswordsListResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ResourceId: !Ref PasswordsListResource
       HttpMethod: POST
       AuthorizationType: COGNITO_USER_POOLS
       AuthorizerId:
-        Fn::ImportValue: ServerlessPassAuthorizerId
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}AuthorizerId"
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri:
-          Fn::Sub:
-          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations"
-          - LambdaFunctionArn:
-              Fn::GetAtt:
-              - LambdaFunction
-              - Arn
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations"
   PostPasswordsCreateMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ResourceId:
-        Ref: PasswordsCreateResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ResourceId: !Ref PasswordsCreateResource
       HttpMethod: POST
       AuthorizationType: COGNITO_USER_POOLS
       AuthorizerId:
-        Fn::ImportValue: ServerlessPassAuthorizerId
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}AuthorizerId"
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri:
-          Fn::Sub:
-          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations"
-          - LambdaFunctionArn:
-              Fn::GetAtt:
-              - LambdaFunction
-              - Arn
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations"
   PostPasswordsImportMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ResourceId:
-        Ref: PasswordsImportResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ResourceId: !Ref PasswordsImportResource
       HttpMethod: POST
       AuthorizationType: COGNITO_USER_POOLS
       AuthorizerId:
-        Fn::ImportValue: ServerlessPassAuthorizerId
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}AuthorizerId"
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri:
-          Fn::Sub:
-          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations"
-          - LambdaFunctionArn:
-              Fn::GetAtt:
-              - LambdaFunction
-              - Arn
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations"
   PostPasswordsUpdateIdMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ResourceId:
-        Ref: PasswordsUpdateIdResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ResourceId: !Ref PasswordsUpdateIdResource
       HttpMethod: POST
       AuthorizationType: COGNITO_USER_POOLS
       AuthorizerId:
-        Fn::ImportValue: ServerlessPassAuthorizerId
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}AuthorizerId"
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri:
-          Fn::Sub:
-          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations"
-          - LambdaFunctionArn:
-              Fn::GetAtt:
-              - LambdaFunction
-              - Arn
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations"
   PostPasswordsDeleteIdMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ResourceId:
-        Ref: PasswordsDeleteIdResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ResourceId: !Ref PasswordsDeleteIdResource
       HttpMethod: POST
       AuthorizationType: COGNITO_USER_POOLS
       AuthorizerId:
-        Fn::ImportValue: ServerlessPassAuthorizerId
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}AuthorizerId"
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri:
-          Fn::Sub:
-          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunctionArn}/invocations"
-          - LambdaFunctionArn:
-              Fn::GetAtt:
-              - LambdaFunction
-              - Arn
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations"
   GetPasswordsMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ResourceId:
-        Ref: PasswordsResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ResourceId: !Ref PasswordsResource
       HttpMethod: GET
       AuthorizationType: NONE
       Integration:
@@ -434,14 +357,13 @@ Resources:
           Fn::Sub:
           - "https://${ApiGatewayDomain}/passwords/list/"
           - ApiGatewayDomain:
-              Fn::ImportValue: ServerlessPassApiGatewayDomainName
+              Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayDomainName"
   PostPasswordsMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ResourceId:
-        Ref: PasswordsResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ResourceId: !Ref PasswordsResource
       HttpMethod: POST
       AuthorizationType: NONE
       Integration:
@@ -451,14 +373,13 @@ Resources:
           Fn::Sub:
           - "https://${ApiGatewayDomain}/passwords/create/"
           - ApiGatewayDomain:
-              Fn::ImportValue: ServerlessPassApiGatewayDomainName
+              Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayDomainName"
   PutPasswordsMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ResourceId:
-        Ref: PasswordsResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ResourceId: !Ref PasswordsResource
       HttpMethod: PUT
       AuthorizationType: NONE
       Integration:
@@ -468,14 +389,13 @@ Resources:
           Fn::Sub:
           - "https://${ApiGatewayDomain}/passwords/import/"
           - ApiGatewayDomain:
-              Fn::ImportValue: ServerlessPassApiGatewayDomainName
+              Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayDomainName"
   PutPasswordsIdMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ResourceId:
-        Ref: PasswordsIdResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ResourceId: !Ref PasswordsIdResource
       HttpMethod: PUT
       AuthorizationType: NONE
       RequestParameters:
@@ -489,14 +409,13 @@ Resources:
           Fn::Sub:
           - "https://${ApiGatewayDomain}/passwords/update/{id}"
           - ApiGatewayDomain:
-              Fn::ImportValue: ServerlessPassApiGatewayDomainName
+              Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayDomainName"
   DeletePasswordsIdMethod:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId:
-        Fn::ImportValue: ServerlessPassApiGatewayId
-      ResourceId:
-        Ref: PasswordsIdResource
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ResourceId: !Ref PasswordsIdResource
       HttpMethod: DELETE
       AuthorizationType: NONE
       RequestParameters:
@@ -510,4 +429,4 @@ Resources:
           Fn::Sub:
           - "https://${ApiGatewayDomain}/passwords/delete/{id}"
           - ApiGatewayDomain:
-              Fn::ImportValue: ServerlessPassApiGatewayDomainName
+              Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayDomainName"

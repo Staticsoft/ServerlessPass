@@ -10,17 +10,23 @@ Parameters:
   DomainHostedZoneId:
     Description: Hosted zone id of domain used to communicate to the backend
     Type: String
+  Stage:
+    Description: Stage is used to deploy multiple instances of ServerlessPass
+    Type: String
 Resources:
+  Alias:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "ServerlessPassBackendServicesAlias${Stage}"
+      Type: String
+      Value: !Sub "ServerlessPass${Stage}"
   Certificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
-      DomainName:
-        Ref: DomainName
+      DomainName: !Ref DomainName
       DomainValidationOptions:
-      - DomainName:
-          Ref: DomainName
-        HostedZoneId:
-          Ref: DomainHostedZoneId
+      - DomainName: !Ref DomainName
+        HostedZoneId: !Ref DomainHostedZoneId
       ValidationMethod: DNS
   UserPool:
     Type: AWS::Cognito::UserPool
@@ -43,7 +49,7 @@ Resources:
       - email
       UsernameConfiguration:
         CaseSensitive: false
-      UserPoolName: "ServerlessPassUsers"
+      UserPoolName: !Sub "${Alias.Value}Users"
       VerificationMessageTemplate:
         DefaultEmailOption: CONFIRM_WITH_LINK
         EmailMessageByLink: Please click the link below to verify your email address.
@@ -58,8 +64,7 @@ Resources:
       - ALLOW_USER_PASSWORD_AUTH
       SupportedIdentityProviders:
       - COGNITO
-      UserPoolId:
-        Ref: UserPool
+      UserPoolId: !Ref UserPool
       TokenValidityUnits:
         AccessToken: days
         IdToken: days
@@ -81,11 +86,11 @@ Resources:
         KeyType: HASH
       - AttributeName: SortKey
         KeyType: RANGE
-      TableName: ServerlessPassPartitionedStorage
+      TableName: !Sub "${Alias.Value}PartitionedStorage"
   LambdaFunctionRolePolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      ManagedPolicyName: ServerlessPassLambdaPolicy
+      ManagedPolicyName: !Sub "${Alias.Value}LambdaPolicy"
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -104,20 +109,14 @@ Resources:
           - dynamodb:Scan
           - dynamodb:UpdateItem
           - dynamodb:DeleteItem
-          Resource:
-            Fn::GetAtt:
-            - Table
-            - Arn
+          Resource: !GetAtt Table.Arn
         - Effect: "Allow"
           Action:
           - cognito-idp:AdminInitiateAuth
           - cognito-idp:AdminCreateUser
           - cognito-idp:AdminSetUserPassword
           - cognito-idp:ListUsers
-          Resource:
-            Fn::GetAtt:
-            - UserPool
-            - Arn
+          Resource: !GetAtt UserPool.Arn
   LambdaFunctionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -131,13 +130,12 @@ Resources:
             Service:
             - lambda.amazonaws.com
       ManagedPolicyArns:
-      - Ref: LambdaFunctionRolePolicy
+      - !Ref LambdaFunctionRolePolicy
   ArtifactsBucket:
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
     Properties:
-      BucketName:
-        Ref: ArtifactsBucketName
+      BucketName: !Ref ArtifactsBucketName
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
@@ -150,12 +148,12 @@ Resources:
   CodeBuildLogs:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: "ServerlessPassBackendCodeBuildLogs"
+      LogGroupName: !Sub "${Alias.Value}BackendCodeBuildLogs"
       RetentionInDays: 90
   CodeBuildPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      ManagedPolicyName: ServerlessPassBackendCodeBuildPolicy
+      ManagedPolicyName: !Sub "${Alias.Value}BackendCodeBuildPolicy"
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -169,23 +167,14 @@ Resources:
           - logs:CreateLogStream
           - logs:DeleteLogStream
           - logs:PutLogEvents
-          Resource:
-            Fn::GetAtt:
-            - CodeBuildLogs
-            - Arn
+          Resource: !GetAtt CodeBuildLogs.Arn
         - Effect: Allow
           Action:
           - s3:GetObject
           - s3:PutObject
           - s3:DeleteObject
           - s3:DeleteObjectVersion
-          Resource:
-            Fn::Sub:
-            - "${ArtifactsBucketArn}/*"
-            - ArtifactsBucketArn:
-                Fn::GetAtt:
-                - ArtifactsBucket
-                - Arn
+          Resource: !Sub "${ArtifactsBucket.Arn}/*"
         - Effect: Allow
           Action:
           - lambda:GetFunction
@@ -195,16 +184,15 @@ Resources:
           - lambda:DeleteFunction
           - lambda:AddPermission
           - lambda:RemovePermission
-          Resource:
-            Fn::Sub: "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:ServerlessPassLambda*"
+          Resource: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Alias.Value}Lambda*"
         - Effect: Allow
           Action:
           - cloudformation:CreateStack
           - cloudformation:UpdateStack
           - cloudformation:DescribeStacks
           Resource:
-          - Fn::Sub: "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/ServerlessPassLambda"
-          - Fn::Sub: "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/ServerlessPassLambda/*"
+          - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${Alias.Value}Lambda"
+          - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${Alias.Value}Lambda/*"
         - Effect: Allow
           Action:
           - apigateway:GET
@@ -214,10 +202,10 @@ Resources:
           - apigateway:DELETE
           - apigateway:TagResource
           Resource:
-          - Fn::Sub: "arn:aws:apigateway:${AWS::Region}::/tags/*"
-          - Fn::Sub: "arn:aws:apigateway:${AWS::Region}::/restapis/${ApiGateway}/*"
-          - Fn::Sub: "arn:aws:apigateway:${AWS::Region}::/domainnames/${ApiGatewayDomain}/basepathmappings"
-          - Fn::Sub: "arn:aws:apigateway:${AWS::Region}::/domainnames/${ApiGatewayDomain}/basepathmappings/*"
+          - !Sub "arn:aws:apigateway:${AWS::Region}::/tags/*"
+          - !Sub "arn:aws:apigateway:${AWS::Region}::/restapis/${ApiGateway}/*"
+          - !Sub "arn:aws:apigateway:${AWS::Region}::/domainnames/${ApiGatewayDomain}/basepathmappings"
+          - !Sub "arn:aws:apigateway:${AWS::Region}::/domainnames/${ApiGatewayDomain}/basepathmappings/*"
   CodeBuildRole:
     Type: AWS::IAM::Role
     Properties:
@@ -231,29 +219,26 @@ Resources:
             Service:
             - codebuild.amazonaws.com
       ManagedPolicyArns:
-      - Ref: CodeBuildPolicy
+      - !Ref CodeBuildPolicy
   ApiGateway:
     Type: AWS::ApiGateway::RestApi
     Properties:
-      Name: ServerlessPassApi
+      Name: !Sub "${Alias.Value}Api"
   Authorizer:
     Type: AWS::ApiGateway::Authorizer
     Properties:
-      Name: ServerlessPassAuthorizer
-      RestApiId:
-        Ref: ApiGateway
+      Name: !Sub "${Alias.Value}Authorizer"
+      RestApiId: !Ref ApiGateway
       Type: COGNITO_USER_POOLS
       ProviderARNs:
-      - Fn::Sub: "arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${UserPool}"
+      - !Sub "arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${UserPool}"
       IdentitySource: method.request.header.Authorization
       AuthorizerResultTtlInSeconds: 3600
   ApiGatewayDomain:
     Type: AWS::ApiGateway::DomainName
     Properties:
-      CertificateArn:
-        Ref: Certificate
-      DomainName:
-        Ref: DomainName
+      CertificateArn: !Ref Certificate
+      DomainName: !Ref DomainName
       EndpointConfiguration:
         Types:
         - EDGE
@@ -261,61 +246,43 @@ Resources:
   ApiDNSRecord:
     Type: AWS::Route53::RecordSet
     Properties:
-      HostedZoneId:
-        Ref: DomainHostedZoneId
-      Name:
-        Ref: DomainName
+      HostedZoneId: !Ref DomainHostedZoneId
+      Name: !Ref DomainName
       AliasTarget:
-        DNSName:
-          Fn::GetAtt:
-          - ApiGatewayDomain
-          - DistributionDomainName
+        DNSName: !GetAtt ApiGatewayDomain.DistributionDomainName
         EvaluateTargetHealth: false
         HostedZoneId: Z2FDTNDATAQYW2
       Type: A
 Outputs:
   LambdaFunctionRoleArn:
-    Value:
-      Fn::GetAtt:
-      - LambdaFunctionRole
-      - Arn
+    Value: !GetAtt LambdaFunctionRole.Arn
     Export:
-      Name: ServerlessPassLambdaFunctionRoleArn
+      Name: !Sub "ServerlessPass${Stage}LambdaFunctionRoleArn"
   UserPoolId:
-    Value:
-      Ref: UserPool
+    Value: !Ref UserPool
     Export:
-      Name: ServerlessPassUserPoolId
+      Name: !Sub "ServerlessPass${Stage}UserPoolId"
   UserPoolClientId:
-    Value:
-      Ref: UserPoolClient
+    Value: !Ref UserPoolClient
     Export:
-      Name: ServerlessPassUserPoolClientId
+      Name: !Sub "ServerlessPass${Stage}UserPoolClientId"
   ApiGatewayId:
-    Value:
-      Ref: ApiGateway
+    Value: !Ref ApiGateway
     Export:
-      Name: ServerlessPassApiGatewayId
+      Name: !Sub "ServerlessPass${Stage}ApiGatewayId"
   ApiGatewayRootResourceId:
-    Value:
-      Fn::GetAtt:
-      - ApiGateway
-      - RootResourceId
+    Value: !GetAtt ApiGateway.RootResourceId
     Export:
-      Name: ServerlessPassApiGatewayRootResourceId
+      Name: !Sub "ServerlessPass${Stage}ApiGatewayRootResourceId"
   AuthorizerId:
-    Value:
-      Ref: Authorizer
+    Value: !Ref Authorizer
     Export:
-      Name: ServerlessPassAuthorizerId
+      Name: !Sub "ServerlessPass${Stage}AuthorizerId"
   DomainName:
-    Value:
-      Ref: ApiGatewayDomain
+    Value: !Ref ApiGatewayDomain
     Export:
-      Name:
-        ServerlessPassApiGatewayDomainName
+      Name: !Sub "ServerlessPass${Stage}ApiGatewayDomainName"
   ArtifactsBucketName:
-    Value:
-      Ref: ArtifactsBucket
+    Value: !Ref ArtifactsBucket
     Export:
-      Name: ServerlessPassArtifactsBucketName
+      Name: !Sub "ServerlessPass${Stage}ArtifactsBucketName"
