@@ -12,7 +12,7 @@ function Publish-Code {
         '-c'
         'Release'
         '-o'
-        "$Local/Publish"
+        "$Local/Backend"
     )
 }
 
@@ -94,8 +94,7 @@ function Write-Stack {
 
 function Wait-Stack {
     param(
-        [string] $condition,
-        [string] $stackName
+        [string] $condition
     )
 
     & aws @(

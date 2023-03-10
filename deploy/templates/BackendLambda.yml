@@ -8,7 +8,7 @@ Resources:
   LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
-      Code: "../../.local/Publish"
+      Code: "../../.local/Backend"
       MemorySize: 1024
       Handler: Server.AWS::Staticsoft.ServerlessPass.Server.AWS.LambdaEntryPoint::FunctionHandlerAsync
       Role:
@@ -206,15 +206,10 @@ Resources:
               - Headers:  
                   Fn::Join:
                   - ","
-                  - - "x-requested-with"
-                    - "content-type"
+                  - - "content-type"
                     - "accept"
                     - "origin"
                     - "authorization"
-                    - "x-csrftoken"
-                    - "user-agent"
-                    - "accept-encoding"
-                    - "cache-control"
             method.response.header.Access-Control-Allow-Methods:
               Fn::Sub:
               - "'${Methods}'"
