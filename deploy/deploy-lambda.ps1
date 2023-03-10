@@ -94,8 +94,7 @@ function Write-Stack {
 
 function Wait-Stack {
     param(
-        [string] $condition,
-        [string] $stackName
+        [string] $condition
     )
 
     & aws @(

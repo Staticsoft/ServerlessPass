@@ -37,7 +37,7 @@ public abstract class Startup
     static Task Cors(HttpContext context, Func<Task> next)
     {
         context.Response.Headers["Access-Control-Allow-Origin"] = "chrome-extension://lcmbpoclaodbgkbjafnkbbinogcbnjih";
-        context.Response.Headers["Access-Control-Allow-Headers"] = "x-requested-with, content-type, accept, origin, authorization, x-csrftoken, user-agent, accept-encoding, cache-control";
+        context.Response.Headers["Access-Control-Allow-Headers"] = "content-type, accept, origin, authorization";
         context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
 
         if (context.Request.Method != "OPTIONS") return next();
