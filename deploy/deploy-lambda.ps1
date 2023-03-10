@@ -12,7 +12,7 @@ function Publish-Code {
         '-c'
         'Release'
         '-o'
-        "$Local/Publish"
+        "$Local/Backend"
     )
 }
 

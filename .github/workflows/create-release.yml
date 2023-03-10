@@ -19,8 +19,8 @@ jobs:
           publish \
           code/backend/Server.AWS/Server.AWS.csproj \
           -c Release \
-          -o .local/Publish;
-        zip -r .local/Backend.zip .local/Publish deploy/templates/BackendLambda.yml;
+          -o .local/Backend;
+        zip -r .local/Backend.zip .local/Backend deploy/templates/BackendLambda.yml;
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
