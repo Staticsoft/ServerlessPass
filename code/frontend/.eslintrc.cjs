@@ -3,7 +3,7 @@ module.exports = {
     browser: true,
     es2021: true
   },
-  extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:@typescript-eslint/recommended'],
+  extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:@typescript-eslint/recommended', 'plugin:storybook/recommended'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 'latest',
@@ -14,40 +14,30 @@ module.exports = {
     'prettier/prettier': 'error',
     '@typescript-eslint/comma-dangle': 'off',
     '@typescript-eslint/indent': ['error', 2],
-    'react/jsx-newline': [
-      'error',
-      {
-        prevent: false
-      }
-    ],
+    'react/jsx-newline': ['error', {
+      prevent: false
+    }],
     'react/react-in-jsx-scope': 'off',
     'import/no-duplicates': 'error',
     'import/extensions': 'off',
-    'import/order': [
-      'error',
-      {
-        'newlines-between': 'always',
-        groups: ['builtin', 'external', 'internal', 'parent', 'sibling'],
-        pathGroups: [
-          {
-            pattern: '~/**',
-            group: 'sibling',
-            position: 'before'
-          }
-        ],
-        alphabetize: {
-          order: 'asc',
-          caseInsensitive: true
-        }
+    'import/order': ['error', {
+      'newlines-between': 'always',
+      groups: ['builtin', 'external', 'internal', 'parent', 'sibling'],
+      pathGroups: [{
+        pattern: '~/**',
+        group: 'sibling',
+        position: 'before'
+      }],
+      alphabetize: {
+        order: 'asc',
+        caseInsensitive: true
       }
-    ]
+    }]
   },
-  overrides: [
-    {
-      files: ['*.stories.tsx'],
-      rules: {
-        'import/no-extraneous-dependencies': 'off'
-      }
+  overrides: [{
+    files: ['*.stories.tsx'],
+    rules: {
+      'import/no-extraneous-dependencies': 'off'
     }
-  ]
+  }]
 };
