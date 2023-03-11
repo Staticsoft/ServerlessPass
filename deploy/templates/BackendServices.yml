@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: ServerlessPass services used by the backend.
 Parameters:
   ArtifactsBucketName:
-    Description: Bucket to store artifacts for the application
+    Description: Bucket to store artifacts for the backend
     Type: String
   DomainName:
     Description: Domain name used to communicate to the backend
@@ -285,4 +285,4 @@ Outputs:
   ArtifactsBucketName:
     Value: !Ref ArtifactsBucket
     Export:
-      Name: !Sub "ServerlessPass${Stage}ArtifactsBucketName"
+      Name: !Sub "ServerlessPass${Stage}BackendArtifactsBucketName"

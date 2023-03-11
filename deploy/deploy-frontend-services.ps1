@@ -2,8 +2,8 @@ param(
     [string] $Stage = 'Dev'
 )
 
-$StackName = "ServerlessPassBackendServices$Stage"
-$ParametersFileName = "BackendServicesParameters$Stage.json"
+$StackName = "ServerlessPassFrontendServices$Stage"
+$ParametersFileName = "FrontendParameters$Stage.json"
 
 function Deploy-Stack {
     $stack = Find-Stack
@@ -43,7 +43,7 @@ function Write-Stack {
         '--stack-name'
         $StackName
         '--template-body'
-        "file://$PSScriptRoot/templates/BackendServices.yml"
+        "file://$PSScriptRoot/templates/FrontendServices.yml"
         '--parameters'
         "file://$PSScriptRoot/../.local/deploy/$ParametersFileName"
         '--capabilities'
