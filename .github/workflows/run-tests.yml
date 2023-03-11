@@ -11,7 +11,16 @@ jobs:
       with:
         dotnet-version: | 
           6.0.x
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 19.7.0
     - name: Checkout repository
       uses: actions/checkout@v2
     - name: Run backend tests
       run: dotnet test code/backend/ServerlessPass.sln
+    - name: Build frontend
+      run: |
+        pushd code/frontend;
+        npm install;
+        npm run build;
+        popd;
