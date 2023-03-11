@@ -13,5 +13,5 @@ jobs:
           6.0.x
     - name: Checkout repository
       uses: actions/checkout@v2
-    - name: Run tests
+    - name: Run backend tests
       run: dotnet test code/backend/ServerlessPass.sln

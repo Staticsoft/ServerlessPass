@@ -11,6 +11,9 @@ jobs:
       with:
         dotnet-version: | 
           6.0.x
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 19.7.0
     - name: Checkout repository
       uses: actions/checkout@v2
     - name: Build and zip backend
@@ -21,6 +24,13 @@ jobs:
           -c Release \
           -o .local/Backend;
         zip -r .local/Backend.zip .local/Backend deploy/templates/BackendLambda.yml;
+    - name: Build and zip frontend
+      run: |
+        pushd code/frontend;
+        npm install;
+        npm run build;
+        popd;
+        zip -r .local/Frontend.zip .local/Frontend
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
@@ -29,4 +39,4 @@ jobs:
         title: "Auto-generated release v${{ github.run_number }}"
         files: |
           .local/Backend.zip
-          
+          .local/Frontend.zip

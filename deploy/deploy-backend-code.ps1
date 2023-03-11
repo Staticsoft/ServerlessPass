@@ -17,7 +17,7 @@ function Publish-Code {
 }
 
 function Publish-Template {
-    $bucketName = Get-ExportValue -Name "ServerlessPass${Stage}ArtifactsBucketName"
+    $bucketName = Get-ExportValue -Name "ServerlessPass${Stage}BackendArtifactsBucketName"
 
     & aws @(
         'cloudformation'
