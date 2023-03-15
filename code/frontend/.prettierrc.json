@@ -1,6 +1,6 @@
 {
     "tabWidth": 2,
-    "endOfLine": "lf",
+    "endOfLine": "crlf",
     "singleQuote": true,
     "arrowParens": "avoid",
     "trailingComma": "none",

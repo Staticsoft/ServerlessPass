@@ -1,3 +1,12 @@
+import { ChakraProvider } from '@chakra-ui/react';
+import { PhoneIphone } from '@mui/icons-material';
+
+import { LearningBlock } from './Info';
+
 export function App() {
-  return <div></div>;
+  return (
+    <ChakraProvider>
+      <LearningBlock icon={PhoneIphone} text="" title="" />
+    </ChakraProvider>
+  );
 }
