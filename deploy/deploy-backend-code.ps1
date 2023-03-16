@@ -2,7 +2,7 @@ param(
     [string] $Stage = 'Dev'
 )
 
-$StackName = "ServerlessPassBackendLambda$Stage"
+$StackName = "ServerlessPass${Stage}BackendLambda"
 $Local = "$PSScriptRoot/../.local"
 
 function Publish-Code {
@@ -119,7 +119,7 @@ function New-Deployment {
     )
 }
 
-Publish-Code
+#Publish-Code
 Publish-Template
 Deploy-Stack
-New-Deployment
+#New-Deployment

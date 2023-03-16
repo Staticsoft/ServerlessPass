@@ -46,7 +46,7 @@ Resources:
     Type: AWS::Events::Rule
     Properties:
       Description: "Checks lambda's status every minute"
-      Name: !Sub "${LambdaFunction}Status"
+      Name: !Sub "ServerlessPass${Stage}StatusRule"
       ScheduleExpression: "rate(1 minute)"
       State: "ENABLED"
       Targets:
@@ -57,6 +57,19 @@ Resources:
     Type: AWS::ApiGateway::Deployment
     DependsOn:
     - OptionsMethod
+    - PostAuthUsersMethod
+    - PostAuthJwtCreateMethod
+    - PostAuthJwtRefreshMethod
+    - PostPasswordsListMethod
+    - PostPasswordsCreateMethod
+    - PostPasswordsImportMethod
+    - PostPasswordsUpdateIdMethod
+    - PostPasswordsDeleteIdMethod
+    - GetPasswordsMethod
+    - PostPasswordsMethod
+    - PutPasswordsMethod
+    - PutPasswordsIdMethod
+    - DeletePasswordsIdMethod
     Properties:
       RestApiId:
         Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
