@@ -117,8 +117,6 @@ Resources:
         - Effect: "Allow"
           Action:
           - cognito-idp:AdminInitiateAuth
-          - cognito-idp:AdminCreateUser
-          - cognito-idp:AdminSetUserPassword
           - cognito-idp:ListUsers
           Resource: !GetAtt UserPool.Arn
   LambdaFunctionRole:
@@ -181,10 +179,13 @@ Resources:
                 - |
                   if ! aws cloudformation describe-stacks --region ${AWS::Region} --stack-name ${Alias.Value}BackendLambda; then
                     aws cloudformation create-stack --region ${AWS::Region} --stack-name ${Alias.Value}BackendLambda --template-body file://BackendLambda.yml --parameters ParameterKey=Stage,ParameterValue=${Stage};
+                    aws cloudformation wait stack-create-complete --stack-name ${Alias.Value}BackendLambda;
                   else
-                    aws cloudformation update-stack --region ${AWS::Region} --stack-name ${Alias.Value}BackendLambda --template-body file://BackendLambda.yml --parameters ParameterKey=Stage,ParameterValue=${Stage};
+                    aws cloudformation update-stack --region ${AWS::Region} --stack-name ${Alias.Value}BackendLambda --template-body file://BackendLambda.yml --parameters ParameterKey=Stage,ParameterValue=${Stage} || exit 1;
+                    aws cloudformation wait stack-update-complete --stack-name ${Alias.Value}BackendLambda;
                   fi
-      TimeoutInMinutes: 5
+                - aws apigateway create-deployment --rest-api-id ${ApiGateway} --stage-name ${Stage};
+      TimeoutInMinutes: 10
   CodeBuildLogs:
     Type: AWS::Logs::LogGroup
     Properties:
