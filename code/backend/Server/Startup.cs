@@ -36,7 +36,13 @@ public abstract class Startup
 
     static Task Cors(HttpContext context, Func<Task> next)
     {
-        context.Response.Headers["Access-Control-Allow-Origin"] = "chrome-extension://lcmbpoclaodbgkbjafnkbbinogcbnjih";
+        if (!context.Request.Headers.Origin.Any()) return next();
+
+        var origin = context.Request.Headers.Origin.Single();
+        if (AllowedOrigins.Contains(origin))
+        {
+            context.Response.Headers["Access-Control-Allow-Origin"] = origin;
+        }
         context.Response.Headers["Access-Control-Allow-Headers"] = "content-type, accept, origin, authorization";
         context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
 
@@ -45,4 +51,10 @@ public abstract class Startup
         context.Response.StatusCode = 200;
         return context.Response.CompleteAsync();
     }
+
+    static string[] AllowedOrigins
+        => Configuration("CrossOriginDomains").Split(',');
+
+    static string Configuration(string name)
+         => Environment.GetEnvironmentVariable(name) ?? throw new NullReferenceException($"Environment varialbe {name} is not set");
 }

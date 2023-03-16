@@ -13,6 +13,10 @@ Parameters:
   Stage:
     Description: Stage is used to deploy multiple instances of ServerlessPass
     Type: String
+  CrossOriginDomains:
+    Description: "Comma-separated domains allowed to make requests to the backend (example: https://example.com,http://localhost:5000)"
+    Type: String
+    Default: "chrome-extension://lcmbpoclaodbgkbjafnkbbinogcbnjih"
 Resources:
   Alias:
     Type: AWS::SSM::Parameter
@@ -286,3 +290,7 @@ Outputs:
     Value: !Ref ArtifactsBucket
     Export:
       Name: !Sub "ServerlessPass${Stage}BackendArtifactsBucketName"
+  CrossOriginDomains:
+    Value: !Ref CrossOriginDomains
+    Export:
+      Name: !Sub "ServerlessPass${Stage}CrossOriginDomains"
