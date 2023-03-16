@@ -20,12 +20,20 @@ Resources:
       Name: !Sub "ServerlessPassFrontendServicesAlias${Stage}"
       Type: String
       Value: !Sub "ServerlessPass${Stage}"
-  Certificate:
+  FrontendCertificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
       DomainName: !Ref DomainName
       DomainValidationOptions:
       - DomainName: !Ref DomainName
+        HostedZoneId: !Ref DomainHostedZoneId
+      ValidationMethod: DNS
+  AuthCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Sub "auth.${DomainName}"
+      DomainValidationOptions:
+      - DomainName: !Sub "auth.${DomainName}"
         HostedZoneId: !Ref DomainHostedZoneId
       ValidationMethod: DNS
   ArtifactsBucket:
@@ -94,7 +102,7 @@ Resources:
             OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${OriginAccessIdentity}"
         PriceClass: PriceClass_100
         ViewerCertificate:
-          AcmCertificateArn: !Ref Certificate
+          AcmCertificateArn: !Ref FrontendCertificate
           MinimumProtocolVersion: TLSv1.2_2019
           SslSupportMethod: sni-only
   FrontendDNSRecord:
@@ -104,6 +112,50 @@ Resources:
       Name: !Ref DomainName
       AliasTarget:
         DNSName: !GetAtt CloudFrontDistribution.DomainName
+        EvaluateTargetHealth: false
+        HostedZoneId: Z2FDTNDATAQYW2
+      Type: A
+  AuthenticationClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      AllowedOAuthFlows:
+      - code
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes:
+      - openid
+      CallbackURLs:
+      - !Sub https://${DomainName}
+      ClientName: FrontendUserPoolClient
+      ExplicitAuthFlows:
+      - ALLOW_USER_PASSWORD_AUTH
+      - ALLOW_REFRESH_TOKEN_AUTH
+      GenerateSecret: false
+      SupportedIdentityProviders:
+      - COGNITO
+      UserPoolId:
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}UserPoolId"
+      TokenValidityUnits:
+        AccessToken: days
+        IdToken: days
+        RefreshToken: days
+      RefreshTokenValidity: 3650
+      AccessTokenValidity: 1
+      IdTokenValidity: 1
+  AuthenticationDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      CustomDomainConfig:
+        CertificateArn: !Ref AuthCertificate
+      Domain: !Sub "auth.${DomainName}"
+      UserPoolId:
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}UserPoolId"
+  AuthDNSRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref DomainHostedZoneId
+      Name: !Sub "auth.${DomainName}"
+      AliasTarget:
+        DNSName: !GetAtt AuthenticationDomain.CloudFrontDistribution
         EvaluateTargetHealth: false
         HostedZoneId: Z2FDTNDATAQYW2
       Type: A

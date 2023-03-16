@@ -6,13 +6,14 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build application server",
-            "program": "${workspaceFolder}/code/backend/Server.Local/bin/Debug/net6.0/Server.Local.dll",
+            "program": "${workspaceFolder}/Server.Local/bin/Debug/net6.0/Server.Local.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/code/backend/Server.Local",
+            "cwd": "${workspaceFolder}/Server.Local",
             "stopAtEntry": false,
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
-                "ASPNETCORE_URLS": "http://localhost:5001"
+                "ASPNETCORE_URLS": "http://localhost:5001",
+                "CrossOriginDomains": "http://localhost:5000"
             }
         },
         {
@@ -20,9 +21,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build authentication server",
-            "program": "${workspaceFolder}/code/backend/Server.Users.Fake/bin/Debug/net6.0/Server.Users.Fake.dll",
+            "program": "${workspaceFolder}/Server.Users.Fake/bin/Debug/net6.0/Server.Users.Fake.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/code/backend/Server.Users.Fake",
+            "cwd": "${workspaceFolder}/Server.Users.Fake",
             "stopAtEntry": false,
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
