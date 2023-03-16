@@ -119,7 +119,7 @@ function New-Deployment {
     )
 }
 
-#Publish-Code
+Publish-Code
 Publish-Template
 Deploy-Stack
-#New-Deployment
+New-Deployment
