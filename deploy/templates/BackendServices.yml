@@ -13,6 +13,7 @@ Parameters:
   Stage:
     Description: Stage is used to deploy multiple instances of ServerlessPass
     Type: String
+    Default: Default
   CrossOriginDomains:
     Description: "Comma-separated domains allowed to make requests to the backend (example: https://example.com,http://localhost:5000)"
     Type: String
