@@ -13,6 +13,11 @@ Parameters:
   Stage:
     Description: Stage is used to deploy multiple instances of ServerlessPass
     Type: String
+    Default: Default
+  CrossOriginDomains:
+    Description: "Comma-separated domains allowed to make requests to the backend (example: https://example.com,http://localhost:5000)"
+    Type: String
+    Default: "chrome-extension://lcmbpoclaodbgkbjafnkbbinogcbnjih"
 Resources:
   Alias:
     Type: AWS::SSM::Parameter
@@ -113,8 +118,6 @@ Resources:
         - Effect: "Allow"
           Action:
           - cognito-idp:AdminInitiateAuth
-          - cognito-idp:AdminCreateUser
-          - cognito-idp:AdminSetUserPassword
           - cognito-idp:ListUsers
           Resource: !GetAtt UserPool.Arn
   LambdaFunctionRole:
@@ -145,6 +148,45 @@ Resources:
         Rules:
         - ExpirationInDays: 1
           Status: Enabled
+  CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:6.0
+        Type: LINUX_CONTAINER
+      LogsConfig:
+        CloudWatchLogs:
+          GroupName: !Ref CodeBuildLogs
+          Status: ENABLED
+          StreamName: CodeBuildProject
+      Name: !Sub "${Alias.Value}BackendDeploy"
+      ServiceRole: !Ref CodeBuildRole
+      Source:
+        Type: NO_SOURCE
+        BuildSpec:
+          !Sub |
+            version: 0.2
+            env:
+              shell: bash
+            phases:
+              build:
+                commands:
+                - wget https://github.com/Staticsoft/ServerlessPass/releases/latest/download/Backend.zip
+                - unzip Backend.zip
+                - aws cloudformation package --template-file $CODEBUILD_SRC_DIR/deploy/templates/BackendLambda.yml --s3-bucket ${ArtifactsBucket} --output-template-file BackendLambda.yml;
+                - |
+                  if ! aws cloudformation describe-stacks --region ${AWS::Region} --stack-name ${Alias.Value}BackendLambda; then
+                    aws cloudformation create-stack --region ${AWS::Region} --stack-name ${Alias.Value}BackendLambda --template-body file://BackendLambda.yml --parameters ParameterKey=Stage,ParameterValue=${Stage};
+                    aws cloudformation wait stack-create-complete --stack-name ${Alias.Value}BackendLambda;
+                  else
+                    aws cloudformation update-stack --region ${AWS::Region} --stack-name ${Alias.Value}BackendLambda --template-body file://BackendLambda.yml --parameters ParameterKey=Stage,ParameterValue=${Stage} || exit 1;
+                    aws cloudformation wait stack-update-complete --stack-name ${Alias.Value}BackendLambda;
+                  fi
+                - aws apigateway create-deployment --rest-api-id ${ApiGateway} --stage-name ${Stage};
+      TimeoutInMinutes: 10
   CodeBuildLogs:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -184,15 +226,16 @@ Resources:
           - lambda:DeleteFunction
           - lambda:AddPermission
           - lambda:RemovePermission
-          Resource: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Alias.Value}Lambda*"
+          Resource: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Alias.Value}BackendLambda*"
         - Effect: Allow
           Action:
           - cloudformation:CreateStack
+          - cloudformation:DeleteStack
           - cloudformation:UpdateStack
           - cloudformation:DescribeStacks
           Resource:
-          - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${Alias.Value}Lambda"
-          - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${Alias.Value}Lambda/*"
+          - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${Alias.Value}BackendLambda"
+          - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${Alias.Value}BackendLambda/*"
         - Effect: Allow
           Action:
           - apigateway:GET
@@ -206,6 +249,17 @@ Resources:
           - !Sub "arn:aws:apigateway:${AWS::Region}::/restapis/${ApiGateway}/*"
           - !Sub "arn:aws:apigateway:${AWS::Region}::/domainnames/${ApiGatewayDomain}/basepathmappings"
           - !Sub "arn:aws:apigateway:${AWS::Region}::/domainnames/${ApiGatewayDomain}/basepathmappings/*"
+        - Effect: Allow
+          Action:
+          - events:DescribeRule
+          - events:PutRule
+          - events:DeleteRule
+          - events:EnableRule
+          - events:DisableRule
+          - events:PutTargets
+          - events:RemoveTargets
+          Resource:
+            Fn::Sub: "arn:aws:events:${AWS::Region}:${AWS::AccountId}:rule/${Alias.Value}StatusRule"
   CodeBuildRole:
     Type: AWS::IAM::Role
     Properties:
@@ -286,3 +340,7 @@ Outputs:
     Value: !Ref ArtifactsBucket
     Export:
       Name: !Sub "ServerlessPass${Stage}BackendArtifactsBucketName"
+  CrossOriginDomains:
+    Value: !Ref CrossOriginDomains
+    Export:
+      Name: !Sub "ServerlessPass${Stage}CrossOriginDomains"

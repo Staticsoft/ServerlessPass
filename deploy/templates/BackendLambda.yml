@@ -22,6 +22,8 @@ Resources:
           CognitoUserPoolId:
             Fn::ImportValue: !Sub "ServerlessPass${Stage}UserPoolId"
           DynamoDbTableNamePrefix: !Sub "ServerlessPass${Stage}"
+          CrossOriginDomains:
+            Fn::ImportValue: !Sub "ServerlessPass${Stage}CrossOriginDomains"
   LambdaApiGatewayPermission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -44,7 +46,7 @@ Resources:
     Type: AWS::Events::Rule
     Properties:
       Description: "Checks lambda's status every minute"
-      Name: !Sub "${LambdaFunction}Status"
+      Name: !Sub "ServerlessPass${Stage}StatusRule"
       ScheduleExpression: "rate(1 minute)"
       State: "ENABLED"
       Targets:
@@ -55,6 +57,18 @@ Resources:
     Type: AWS::ApiGateway::Deployment
     DependsOn:
     - OptionsMethod
+    - PostAuthJwtCreateMethod
+    - PostAuthJwtRefreshMethod
+    - PostPasswordsListMethod
+    - PostPasswordsCreateMethod
+    - PostPasswordsImportMethod
+    - PostPasswordsUpdateIdMethod
+    - PostPasswordsDeleteIdMethod
+    - GetPasswordsMethod
+    - PostPasswordsMethod
+    - PutPasswordsMethod
+    - PutPasswordsIdMethod
+    - DeletePasswordsIdMethod
     Properties:
       RestApiId:
         Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
@@ -195,11 +209,16 @@ Resources:
       HttpMethod: OPTIONS
       AuthorizationType: None
       ApiKeyRequired: false
+      RequestParameters:
+        method.request.header.Access-Control-Allow-Origin: false
       Integration:
         Type: MOCK
+        PassthroughBehavior: WHEN_NO_TEMPLATES
+        RequestTemplates:
+          "application/json": "{\"statusCode\": 200}"
         IntegrationResponses:
-        - ResponseParameters:
-            method.response.header.Access-Control-Allow-Origin: "'chrome-extension://lcmbpoclaodbgkbjafnkbbinogcbnjih'"
+        - StatusCode: 200
+          ResponseParameters:
             method.response.header.Access-Control-Allow-Headers:
               Fn::Sub:
               - "'${Headers}'"
@@ -221,28 +240,25 @@ Resources:
                     - "PUT"
                     - "DELETE"
                     - "OPTIONS"
-          StatusCode: 200
-        PassthroughBehavior: WHEN_NO_TEMPLATES
-        RequestTemplates:
-          "application/json": "{\"statusCode\": 200}"
+          ResponseTemplates:
+            application/json:
+              Fn::Sub:
+              - |
+                $input.json("$")
+                #set($domainsInline = "${CrossOriginDomains}")
+                #set($domains = $domainsInline.split(","))
+                #set($origin = $input.params("origin"))
+                #if($domains.contains($origin))
+                #set($context.responseOverride.header.Access-Control-Allow-Origin = "$origin")
+                #end
+              - CrossOriginDomains:
+                  Fn::ImportValue: !Sub "ServerlessPass${Stage}CrossOriginDomains"
       MethodResponses:
       - StatusCode: 200
         ResponseParameters:
           method.response.header.Access-Control-Allow-Origin: true
           method.response.header.Access-Control-Allow-Headers: true
           method.response.header.Access-Control-Allow-Methods: true
-  PostAuthUsersMethod:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      RestApiId:
-        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
-      ResourceId: !Ref AuthUsersResource
-      HttpMethod: POST
-      AuthorizationType: NONE
-      Integration:
-        Type: AWS_PROXY
-        IntegrationHttpMethod: POST
-        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations"
   PostAuthJwtCreateMethod:
     Type: AWS::ApiGateway::Method
     Properties:

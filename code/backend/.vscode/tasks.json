@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/code/backend/Server.Local/Server.Local.csproj",
+                "${workspaceFolder}/Server.Local/Server.Local.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/code/backend/Server.Users.Fake/Server.Users.Fake.csproj",
+                "${workspaceFolder}/Server.Users.Fake/Server.Users.Fake.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],

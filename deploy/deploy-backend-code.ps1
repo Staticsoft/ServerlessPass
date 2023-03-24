@@ -2,7 +2,7 @@ param(
     [string] $Stage = 'Dev'
 )
 
-$StackName = "ServerlessPassBackendLambda$Stage"
+$StackName = "ServerlessPass${Stage}BackendLambda"
 $Local = "$PSScriptRoot/../.local"
 
 function Publish-Code {
