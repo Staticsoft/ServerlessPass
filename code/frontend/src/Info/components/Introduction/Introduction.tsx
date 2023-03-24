@@ -3,9 +3,7 @@ import { Button, Flex, HStack, Image, Stack, Text } from '@chakra-ui/react';
 import Logo from '~/assets/logo.png';
 import { useLocale } from '~/locale';
 
-import { IntroductionProps } from './Introduction.types';
-
-export const Introduction: React.FC<IntroductionProps> = () => {
+export const Introduction: React.FC = () => {
   return (
     <HStack spacing={'80px'}>
       <Stack maxWidth={{ sm: '100%', md: 550 }} spacing={'24px'}>

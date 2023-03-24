@@ -3,3 +3,5 @@
 package-lock.json
 vite.config.ts
 .eslintrc.cjs
+
+*styles.module.scss*
