@@ -1,14 +1,12 @@
 import { Meta, Story } from '@storybook/react';
 
-import { InfoPage } from './InfoPage';
+import { InfoPage } from '~/Info';
 
 export default {
   title: 'InfoPage'
 } as Meta;
 
-interface Args {}
-
-export const Default: Story<Args> = args => {
+export const Default: Story = args => {
   return <InfoPage {...args} />;
 };
 
