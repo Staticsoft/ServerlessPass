@@ -1,0 +1,12 @@
+.setupGuide {
+    > *:not(:last-child) {
+        margin-right: 20px;
+    }
+
+    @media only screen and (max-width: 48em) {
+        > *:not(:last-child) {
+            margin-right: 0px;
+            margin-bottom: 20px;
+        }
+    }
+}
