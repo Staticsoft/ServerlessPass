@@ -42,5 +42,8 @@ export const enLocale = {
     signUp: 'Sign Up',
     hostAWS: 'Host on AWS',
     gitHub: 'Open GitHub'
+  },
+  checkboxes: {
+    selectAll: 'Select all'
   }
 };

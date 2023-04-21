@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 
 import { Introduction } from '~/Info';
 
@@ -9,8 +9,8 @@ export default {
   }
 } as Meta;
 
-export const Default: Story = args => {
-  return <Introduction {...args} />;
+export const Default: StoryFn = () => {
+  return <Introduction />;
 };
 
 Default.storyName = 'Introduction';
