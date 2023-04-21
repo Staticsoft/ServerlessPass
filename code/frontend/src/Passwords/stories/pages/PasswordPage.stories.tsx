@@ -1,11 +1,11 @@
 import { Meta, StoryFn } from '@storybook/react';
 
-import { PasswordsTable } from '../components/PasswordsTable';
-import { patterns } from '../data';
-import { Password } from '../types';
+import { patterns } from '../../data';
+import { PasswordPage } from '../../pages';
+import { Password } from '../../types';
 
 export default {
-  title: 'Passwords/PasswordsTable'
+  title: 'Passwords/pages/PasswordPage'
 } as Meta;
 
 function generatePattern(): string {
@@ -30,8 +30,12 @@ function createPassword(number: number): Password {
   };
 }
 
-export const Default: StoryFn = () => {
-  return <PasswordsTable passwords={[createPassword(0), createPassword(1), createPassword(2)]} />;
+const getPasswords = (): Password[] => {
+  return [createPassword(0), createPassword(1), createPassword(2)];
 };
 
-Default.storyName = 'PasswordsTable';
+export const Default: StoryFn = () => {
+  return <PasswordPage getPasswords={getPasswords} />;
+};
+
+Default.storyName = 'PasswordPage';

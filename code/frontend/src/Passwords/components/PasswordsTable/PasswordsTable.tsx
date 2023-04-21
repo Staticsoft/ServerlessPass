@@ -16,10 +16,8 @@ export const PasswordsTable: FC<PasswordsTableProps> = props => {
       const filterKeys = Object.keys(filterSettings) as Array<'pattern' | 'length'>;
 
       for (const k of filterKeys) {
-        console.log(k);
         switch (k) {
           case 'length':
-            console.log(filterSettings['length'], pass.length);
             if (
               filterSettings['length'].length > 0 &&
               !filterSettings['length'].includes(pass.length?.toString() ?? '')

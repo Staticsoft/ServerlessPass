@@ -3,7 +3,7 @@ import { Meta, StoryFn } from '@storybook/react';
 import { SetupGuide } from '~/Info/components';
 
 export default {
-  title: 'Info/SetupGuide',
+  title: 'Info/components/SetupGuide',
   parameters: {
     layout: 'centered'
   }

@@ -3,7 +3,7 @@ import { Meta, StoryFn } from '@storybook/react';
 import { Introduction } from '~/Info';
 
 export default {
-  title: 'Info/Introduction',
+  title: 'Info/components/Introduction',
   parameters: {
     layout: 'centered'
   }

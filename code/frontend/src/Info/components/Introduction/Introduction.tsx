@@ -1,4 +1,6 @@
-import { Button, Flex, HStack, Image, Stack, Text } from '@chakra-ui/react';
+import { Button, HStack, Image, Stack, Text } from '@chakra-ui/react';
+
+import { ServerlessPassTitle } from '../ServerlessPassTitle';
 
 import Logo from '~/assets/logo.png';
 import { useLocale } from '~/locale';
@@ -7,7 +9,7 @@ export const Introduction: React.FC = () => {
   return (
     <HStack spacing={'80px'}>
       <Stack maxWidth={{ sm: '100%', md: 550 }} spacing={'24px'}>
-        <Title />
+        <ServerlessPassTitle />
 
         <Description />
 
@@ -16,22 +18,6 @@ export const Introduction: React.FC = () => {
 
       <Image display={{ sm: 'none', md: 'unset' }} src={Logo} />
     </HStack>
-  );
-};
-
-const Title: React.FC = () => {
-  const { root } = useLocale();
-
-  return (
-    <Flex alignItems={'flex-start'}>
-      <Text fontSize={56} fontWeight={'bold'}>
-        {root.header.title}
-      </Text>
-
-      <Text fontSize={'sm'} fontWeight={'bold'}>
-        {root.header.tm}
-      </Text>
-    </Flex>
   );
 };
 

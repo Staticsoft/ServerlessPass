@@ -3,7 +3,7 @@ import { Meta, StoryFn } from '@storybook/react';
 import { Footer } from '~/Info';
 
 export default {
-  title: 'Info/Footer',
+  title: 'Info/components/Footer',
   parameters: {
     layout: 'centered'
   }

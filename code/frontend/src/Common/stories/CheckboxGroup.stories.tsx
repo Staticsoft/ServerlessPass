@@ -6,7 +6,7 @@ import { useCheckboxGroupKeys } from '../hooks';
 import { patternFilterOptions } from '~/Passwords/data';
 
 export default {
-  title: 'Passwords/CheckboxGroup'
+  title: 'Common/components/CheckboxGroup'
 } as Meta;
 
 export const Default: StoryFn = () => {

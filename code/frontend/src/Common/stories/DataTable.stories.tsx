@@ -5,7 +5,7 @@ import { Column, DataTable } from '../components/DataTable';
 import { patternFilterOptions } from '~/Passwords/data';
 
 export default {
-  title: 'Passwords/DataTable'
+  title: 'Common/components/DataTable'
 } as Meta;
 
 type UnitConversion = {
