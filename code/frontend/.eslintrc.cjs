@@ -32,7 +32,8 @@ module.exports = {
         order: 'asc',
         caseInsensitive: true
       }
-    }]
+    }],
+    'no-console': 'error'
   },
   overrides: [{
     files: ['*.stories.tsx'],

@@ -4,7 +4,7 @@ import type { Meta, StoryFn } from '@storybook/react';
 import { LearningBlock, LearningBlockProps } from '~/Info';
 
 export default {
-  title: 'Info/LearningBlock'
+  title: 'Info/components/LearningBlock'
 } as Meta;
 
 type Args = LearningBlockProps;

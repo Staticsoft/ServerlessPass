@@ -1,18 +1,16 @@
-import { Meta, Story } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react';
 
 import { SetupGuide } from '~/Info/components';
 
 export default {
-  title: 'Info/SetupGuide',
+  title: 'Info/components/SetupGuide',
   parameters: {
     layout: 'centered'
   }
 } as Meta;
 
-export const Default: Story = args => {
-  return <SetupGuide {...args} />;
+export const Default: StoryFn = () => {
+  return <SetupGuide />;
 };
-
-Default.args = {};
 
 Default.storyName = 'SetupGuide';
