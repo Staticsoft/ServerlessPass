@@ -4,6 +4,7 @@ export type Column<DataType extends object> = {
   name: string;
   title: string;
   filterOptions?: Option[];
+
   getRowValue: (row: DataType) => string;
 };
 
@@ -14,6 +15,7 @@ export type FilterSettings = {
 export type DataTableProps<DataType extends object> = {
   data: DataType[];
   columns: Column<DataType>[];
+  emptyMessage?: string;
   getRowKey: (row: DataType) => string;
   onFilterChange?: (filterSettings: FilterSettings) => void;
 };

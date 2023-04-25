@@ -38,6 +38,9 @@ export const enLocale = {
       text: 'Visit our GitHub page!'
     }
   },
+  passwords: {
+    emptyDataMessage: 'No data to display'
+  },
   buttons: {
     signUp: 'Sign Up',
     hostAWS: 'Host on AWS',

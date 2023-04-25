@@ -13,5 +13,8 @@ export default defineConfig({
       '~': path.resolve(__dirname, './src')
     }
   },
-  plugins: [react(), sassDts()]
+  plugins: [react(), sassDts()],
+  server: {
+    port: 5000
+  }
 });
