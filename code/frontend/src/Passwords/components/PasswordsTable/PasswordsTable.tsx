@@ -1,6 +1,8 @@
 import { FC, useMemo, useState } from 'react';
 
 import { DataTable, FilterSettings } from '~/Common';
+import { useLocale } from '~/locale';
+import { filterPasswords } from '~/Passwords/tools';
 
 import { PasswordsTableProps } from './PasswordsTable.types';
 import { getColumns } from './utils';
@@ -11,31 +13,10 @@ export const PasswordsTable: FC<PasswordsTableProps> = props => {
 
   const columns = useMemo(() => getColumns(passwords), [passwords]);
 
+  const locale = useLocale();
+
   const filteredPasswords = () => {
-    return passwords.filter(pass => {
-      const filterKeys = Object.keys(filterSettings) as Array<'pattern' | 'length'>;
-
-      for (const k of filterKeys) {
-        switch (k) {
-          case 'length':
-            if (
-              filterSettings['length'].length > 0 &&
-              !filterSettings['length'].includes(pass.length?.toString() ?? '')
-            )
-              return false;
-            break;
-          case 'pattern':
-            if (
-              filterSettings['pattern'].length > 0 &&
-              filterSettings['pattern'].filter(pattern => pass.pattern?.includes(pattern)).length === 0
-            )
-              return false;
-            break;
-        }
-      }
-
-      return true;
-    });
+    return filterPasswords(passwords, filterSettings);
   };
 
   return (
@@ -43,6 +24,7 @@ export const PasswordsTable: FC<PasswordsTableProps> = props => {
       columns={columns}
       data={filteredPasswords()}
       getRowKey={row => row.id}
+      emptyMessage={locale.passwords.emptyDataMessage}
       onFilterChange={setFilterSettings}
     />
   );

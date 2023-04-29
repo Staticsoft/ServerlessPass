@@ -1,11 +1,16 @@
-import { Button, HStack, Image, Stack, Text } from '@chakra-ui/react';
+import { HStack, Image, Stack } from '@chakra-ui/react';
+import { FC } from 'react';
 
 import { ServerlessPassTitle } from '../ServerlessPassTitle';
 
 import Logo from '~/assets/logo.png';
-import { useLocale } from '~/locale';
 
-export const Introduction: React.FC = () => {
+import { Links, Description } from './components';
+import { IntroductionProps } from './Introduction.types';
+
+export const Introduction: FC<IntroductionProps> = props => {
+  const { onSignUp, onHostAWS } = props;
+
   return (
     <HStack spacing={'80px'}>
       <Stack maxWidth={{ sm: '100%', md: 550 }} spacing={'24px'}>
@@ -13,42 +18,10 @@ export const Introduction: React.FC = () => {
 
         <Description />
 
-        <Links />
+        <Links onSignUp={onSignUp} onHostAWS={onHostAWS} />
       </Stack>
 
       <Image display={{ sm: 'none', md: 'unset' }} src={Logo} />
-    </HStack>
-  );
-};
-
-const Description: React.FC = () => {
-  const { root } = useLocale();
-
-  return (
-    <>
-      {root.header.description.map((paragrath, index) => {
-        return (
-          <Text key={`paragraph-${index}`} fontSize={24}>
-            {paragrath}
-          </Text>
-        );
-      })}
-    </>
-  );
-};
-
-const Links: React.FC = () => {
-  const { buttons } = useLocale();
-
-  return (
-    <HStack width={'100%'} spacing={'40px'} justifyContent={'center'}>
-      <Button width={131} colorScheme={'messenger'} variant={'solid'}>
-        {buttons.signUp}
-      </Button>
-
-      <Button width={131} colorScheme={'messenger'} variant={'outline'}>
-        {buttons.hostAWS}
-      </Button>
     </HStack>
   );
 };
