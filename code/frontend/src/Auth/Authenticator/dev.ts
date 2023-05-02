@@ -2,9 +2,7 @@ import { getTokenFromStorage, getTokenFromUrl, putTokenToStorage, removeTokenFro
 
 import { Authenticator } from './Authenticator.types';
 
-const authUrl = 'http://localhost:5002/login';
-
-function redirectToAuthPage() {
+function redirectToAuthPage(authUrl: string) {
   window.location.replace(`${authUrl}?redirect_uri=${window.location.href}&response_type=code&scope=openid`);
 }
 
@@ -29,7 +27,8 @@ export class DevAuthenticator implements Authenticator {
   signIn = async () => {
     const token = this.getToken();
 
-    if (!token) redirectToAuthPage();
+    const config = await (await fetch('/config.json')).json();
+    if (!token) redirectToAuthPage(`${config.auth}/login`);
 
     return token;
   };

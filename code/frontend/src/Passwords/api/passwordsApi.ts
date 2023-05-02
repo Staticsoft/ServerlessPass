@@ -18,7 +18,9 @@ export class PasswordsApi {
   getPasswordsList = async (token?: string | null): Promise<ApiPasswordsData[]> => {
     if (!token) return [];
 
-    const response = await fetch('http://localhost:5001/passwords', {
+    const config = await (await fetch('/config.json')).json();
+
+    const response = await fetch(`${config.backend}/passwords`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     });

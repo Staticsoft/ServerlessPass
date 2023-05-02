@@ -1,0 +1,4 @@
+{
+  "backend": "http://localhost:5001",
+  "auth": "http://localhost:5002"
+}
