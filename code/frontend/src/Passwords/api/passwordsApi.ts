@@ -18,12 +18,13 @@ export class PasswordsApi {
   getPasswordsList = async (token?: string | null): Promise<ApiPasswordsData[]> => {
     if (!token) return [];
 
-    const responce = await fetch('http://localhost:5001/passwords', {
+    const response = await fetch('http://localhost:5001/passwords', {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     });
 
-    return (await responce.json()) as ApiPasswordsData[];
+    const passwords = await response.json();
+    return passwords.results as ApiPasswordsData[];
   };
 }
 
