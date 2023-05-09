@@ -4,27 +4,17 @@ using Staticsoft.HttpCommunication.Json;
 using Staticsoft.Serialization.Net;
 using Staticsoft.ServerlessPass.Contracts;
 using Staticsoft.ServerlessPass.Server.Local;
+using Staticsoft.Testing.Integration;
 
 namespace Staticsoft.ServerlessPass.Tests;
 
-public class TestBase : TestBase<IntegrationServicesBase<LocalStartup>>
+public class TestBase : IntegrationTestBase<LocalStartup>
 {
-    readonly IServiceProvider Provider;
-
-    public TestBase()
-        => Provider = Services.BuildServiceProvider();
-
-    protected virtual IServiceCollection Services
-        => new ServiceCollection()
-            .UseClientAPI<Schema>()
-            .UseSystemJsonSerializer()
-            .UseJsonHttpCommunication()
-            .AddSingleton(Get<HttpClient>());
+    protected override IServiceCollection ClientServices(IServiceCollection services) => base.ClientServices(services)
+        .UseClientAPI<Schema>()
+        .UseSystemJsonSerializer()
+        .UseJsonHttpCommunication();
 
     protected Schema API
-            => Service<Schema>();
-
-    protected T Service<T>()
-        where T : notnull
-        => Provider.GetRequiredService<T>();
+        => Client<Schema>();
 }

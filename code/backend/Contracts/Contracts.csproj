@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Staticsoft.Contracts.Abstractions" Version="1.0.0-14" />
+    <PackageReference Include="Staticsoft.Contracts.Abstractions" Version="1.0.0-15" />
   </ItemGroup>
 
 </Project>
