@@ -25,6 +25,6 @@
   </ItemGroup>
     
    <ItemGroup>
-    <PackageReference Include="Staticsoft.PartitionedStorage.AWS" Version="1.0.0-6" />
+    <PackageReference Include="Staticsoft.PartitionedStorage.AWS" Version="1.0.0-7" />
   </ItemGroup>
 </Project>

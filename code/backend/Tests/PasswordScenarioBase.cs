@@ -5,11 +5,11 @@ namespace Staticsoft.ServerlessPass.Tests;
 
 public class PasswordScenarioBase : UserScenarioBase, IAsyncLifetime
 {
-    protected override IServiceCollection Services => base.Services
-        .DecorateSingleton<HttpRequestExecutor, AuthenticatedHttpRequestExecutor>();
+    protected override IServiceCollection ClientServices(IServiceCollection services) => base.ClientServices(services)
+        .Decorate<HttpRequestExecutor, AuthenticatedHttpRequestExecutor>();
 
     AuthenticatedHttpRequestExecutor Executor
-        => (AuthenticatedHttpRequestExecutor)Service<HttpRequestExecutor>();
+        => (AuthenticatedHttpRequestExecutor)Client<HttpRequestExecutor>();
 
     public override async Task InitializeAsync()
     {

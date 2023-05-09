@@ -3,15 +3,11 @@ using Staticsoft.ServerlessPass.Server;
 
 namespace Staticsoft.ServerlessPass.Tests;
 
-public class PasswordProfilesIdGeneratorServices : UnitServicesBase
+public class PasswordProfilesIdGeneratorTests : TestBase<PasswordProfilesIdGenerator>
 {
     protected override IServiceCollection Services => base.Services
         .AddSingleton<PasswordProfilesIdGenerator>();
-}
 
-
-public class PasswordProfilesIdGeneratorTests : TestBase<PasswordProfilesIdGenerator, PasswordProfilesIdGeneratorServices>
-{
     [Fact]
     public void GeneratesIdsInReverseOrder()
     {
