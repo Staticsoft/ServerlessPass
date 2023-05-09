@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Staticsoft.Contracts.ASP.Server" Version="1.0.0-15" />
+    <PackageReference Include="Staticsoft.Contracts.ASP.Server" Version="1.0.0-16" />
     <PackageReference Include="Staticsoft.PartitionedStorage.Abstractions" Version="1.0.0-7" />
     <PackageReference Include="Staticsoft.Serialization.Net" Version="1.0.0-7" />
   </ItemGroup>
