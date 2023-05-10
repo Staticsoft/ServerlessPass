@@ -1,59 +1,35 @@
-import { Stack } from '@chakra-ui/react';
-import { FC, useEffect, useState } from 'react';
+import { HStack, Stack } from '@chakra-ui/react';
+import { FC } from 'react';
 
-import { useAuth } from '~/Auth';
 import { ServerlessPassTitle } from '~/Info/components';
-import { ApiPasswordsData, passwordsApi } from '~/Passwords/api';
-import { PasswordsTable } from '~/Passwords/components';
-import { Password } from '~/Passwords/types';
+import { PasswordsApi } from '~/Passwords/api';
+import { ImportButton, PasswordsTable } from '~/Passwords/components';
+import { UsePasswordsHook } from '~/Passwords/hooks';
 
 import classes from './PasswordPage.styles.module.scss';
 
 interface Props {
-  getPasswords: () => Password[];
+  passwordsApi: PasswordsApi;
+  usePasswords: UsePasswordsHook;
 }
 
-const formPatterFromApiPasswordsData = (apiPass: ApiPasswordsData): string => {
-  let pattern = '';
+export const PasswordPage: FC<Props> = props => {
+  const { passwordsApi, usePasswords } = props;
 
-  if (apiPass.uppercase) pattern += 'abc';
-  if (apiPass.lowercase) pattern += 'ABC';
-  if (apiPass.numbers) pattern += '123';
-  if (apiPass.symbols) pattern += '!@#';
-  if (apiPass.digits) pattern += '';
-
-  return pattern;
-};
-
-const apiPasswordToPassword = (apiPass: ApiPasswordsData): Password => {
-  return {
-    id: apiPass.id,
-    site: apiPass.site,
-    login: apiPass.login,
-    pattern: formPatterFromApiPasswordsData(apiPass),
-    counter: apiPass.counter,
-    length: apiPass.length
-  };
-};
-
-export const PasswordPage: FC<Props> = () => {
-  const [passwords, setPasswords] = useState<Password[]>([]);
-  const { token } = useAuth();
-
-  useEffect(() => {
-    (async () => {
-      const apiPasswords = await passwordsApi.getPasswordsList(token);
-
-      setPasswords(apiPasswords.map(apiPasswordToPassword));
-    })();
-  });
+  const { passwords, importPasswords } = usePasswords(passwordsApi);
 
   return (
     <div className={classes.page}>
       <Stack spacing={160}>
         <ServerlessPassTitle />
 
-        <PasswordsTable passwords={passwords} />
+        <Stack spacing={10}>
+          <HStack width={'100%'} justifyContent={'flex-end'}>
+            <ImportButton onImport={importPasswords} />
+          </HStack>
+
+          <PasswordsTable passwords={passwords} />
+        </Stack>
       </Stack>
     </div>
   );
