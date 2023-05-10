@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
 
-import { passwordsApi } from '../api';
+import { PasswordsApi } from '../api';
 import { apiPasswordToPassword } from '../tools';
 import { Password } from '../types';
 
 import { useAuth } from '~/Auth';
 
-export type UsePasswordsHook = () => {
+export type UsePasswordsHook = (passwordsApi: PasswordsApi) => {
   passwords: Password[];
   getPasswords: () => Promise<void>;
   importPasswords: (passwordsJSON: string) => Promise<void>;
 };
 
-export const usePasswords: UsePasswordsHook = () => {
+export const usePasswords: UsePasswordsHook = passwordsApi => {
   const [passwords, setPasswords] = useState<Password[]>([]);
   const { token } = useAuth();
 

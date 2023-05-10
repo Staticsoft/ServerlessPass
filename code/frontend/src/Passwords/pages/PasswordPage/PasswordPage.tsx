@@ -1,37 +1,22 @@
-import { Button, HStack, Stack } from '@chakra-ui/react';
-import { CloudUploadOutlined } from '@mui/icons-material';
-import { ChangeEvent, FC, useRef } from 'react';
+import { HStack, Stack } from '@chakra-ui/react';
+import { FC } from 'react';
 
-import { readFile } from '~/Common';
 import { ServerlessPassTitle } from '~/Info/components';
-import { useLocale } from '~/locale';
-import { PasswordsTable } from '~/Passwords/components';
+import { PasswordsApi } from '~/Passwords/api';
+import { ImportButton, PasswordsTable } from '~/Passwords/components';
 import { UsePasswordsHook } from '~/Passwords/hooks';
 
 import classes from './PasswordPage.styles.module.scss';
 
 interface Props {
+  passwordsApi: PasswordsApi;
   usePasswords: UsePasswordsHook;
 }
 
 export const PasswordPage: FC<Props> = props => {
-  const { usePasswords } = props;
+  const { passwordsApi, usePasswords } = props;
 
-  const { passwords, importPasswords } = usePasswords();
-
-  const { buttons } = useLocale();
-
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const handlePasswordsImport = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target?.files?.[0];
-
-    if (!file) return;
-
-    const importJSON = await readFile(file);
-
-    if (importJSON) await importPasswords(importJSON);
-  };
+  const { passwords, importPasswords } = usePasswords(passwordsApi);
 
   return (
     <div className={classes.page}>
@@ -40,19 +25,7 @@ export const PasswordPage: FC<Props> = props => {
 
         <Stack spacing={10}>
           <HStack width={'100%'} justifyContent={'flex-end'}>
-            <Button
-              colorScheme={'messenger'}
-              variant={'solid'}
-              display={'flex'}
-              gap={2}
-              onClick={() => inputRef.current?.click()}
-            >
-              {buttons.import}
-
-              <CloudUploadOutlined />
-            </Button>
-
-            <input ref={inputRef} hidden type="file" onChange={handlePasswordsImport} />
+            <ImportButton onImport={importPasswords} />
           </HStack>
 
           <PasswordsTable passwords={passwords} />
