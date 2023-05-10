@@ -1,59 +1,62 @@
-import { Stack } from '@chakra-ui/react';
-import { FC, useEffect, useState } from 'react';
+import { Button, HStack, Stack } from '@chakra-ui/react';
+import { CloudUploadOutlined } from '@mui/icons-material';
+import { ChangeEvent, FC, useRef } from 'react';
 
-import { useAuth } from '~/Auth';
+import { readFile } from '~/Common';
 import { ServerlessPassTitle } from '~/Info/components';
-import { ApiPasswordsData, passwordsApi } from '~/Passwords/api';
+import { useLocale } from '~/locale';
 import { PasswordsTable } from '~/Passwords/components';
-import { Password } from '~/Passwords/types';
+import { UsePasswordsHook } from '~/Passwords/hooks';
 
 import classes from './PasswordPage.styles.module.scss';
 
 interface Props {
-  getPasswords: () => Password[];
+  usePasswords: UsePasswordsHook;
 }
 
-const formPatterFromApiPasswordsData = (apiPass: ApiPasswordsData): string => {
-  let pattern = '';
+export const PasswordPage: FC<Props> = props => {
+  const { usePasswords } = props;
 
-  if (apiPass.uppercase) pattern += 'abc';
-  if (apiPass.lowercase) pattern += 'ABC';
-  if (apiPass.numbers) pattern += '123';
-  if (apiPass.symbols) pattern += '!@#';
-  if (apiPass.digits) pattern += '';
+  const { passwords, importPasswords } = usePasswords();
 
-  return pattern;
-};
+  const { buttons } = useLocale();
 
-const apiPasswordToPassword = (apiPass: ApiPasswordsData): Password => {
-  return {
-    id: apiPass.id,
-    site: apiPass.site,
-    login: apiPass.login,
-    pattern: formPatterFromApiPasswordsData(apiPass),
-    counter: apiPass.counter,
-    length: apiPass.length
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handlePasswordsImport = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target?.files?.[0];
+
+    if (!file) return;
+
+    const importJSON = await readFile(file);
+
+    if (importJSON) await importPasswords(importJSON);
   };
-};
-
-export const PasswordPage: FC<Props> = () => {
-  const [passwords, setPasswords] = useState<Password[]>([]);
-  const { token } = useAuth();
-
-  useEffect(() => {
-    (async () => {
-      const apiPasswords = await passwordsApi.getPasswordsList(token);
-
-      setPasswords(apiPasswords.map(apiPasswordToPassword));
-    })();
-  });
 
   return (
     <div className={classes.page}>
       <Stack spacing={160}>
         <ServerlessPassTitle />
 
-        <PasswordsTable passwords={passwords} />
+        <Stack spacing={10}>
+          <HStack width={'100%'} justifyContent={'flex-end'}>
+            <Button
+              colorScheme={'messenger'}
+              variant={'solid'}
+              display={'flex'}
+              gap={2}
+              onClick={() => inputRef.current?.click()}
+            >
+              {buttons.import}
+
+              <CloudUploadOutlined />
+            </Button>
+
+            <input ref={inputRef} hidden type="file" onChange={handlePasswordsImport} />
+          </HStack>
+
+          <PasswordsTable passwords={passwords} />
+        </Stack>
       </Stack>
     </div>
   );
