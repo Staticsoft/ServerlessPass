@@ -29,7 +29,7 @@ app.MapGet("/login", (string redirect_uri, string response_type, string scope) =
 app.MapPost("/login", (HttpContext context) =>
 {
     var request = ToLoginRequest(context.Request.Form);
-    var code = $"{request.user}:{request.redirect_uri}".ToBase64();
+    var code = $"{request.user}!{request.redirect_uri}".ToBase64();
     var redirectToUrl = $"{request.redirect_uri}?code={code}";
     return Results.Redirect(redirectToUrl);
 });
@@ -41,7 +41,7 @@ app.MapPost("/oauth2/token", (HttpContext context) =>
     if (request.client_id != "fake") return InvalidClientId();
 
     var code = request.code.FromBase64();
-    var parts = code.Split(':');
+    var parts = code.Split('!');
     var (user, redirect_uri) = (parts[0], parts[1]);
     if (request.redirect_uri != redirect_uri) return InvalidRequestUri(request, redirect_uri);
 

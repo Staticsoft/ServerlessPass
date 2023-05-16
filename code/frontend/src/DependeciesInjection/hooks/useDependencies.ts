@@ -10,7 +10,7 @@ export const useDependencies = () => {
 
   const { devAuthenticator, passwordsApi } = useMemo(() => {
     return {
-      devAuthenticator: new Authenticator(config.auth),
+      devAuthenticator: new Authenticator(config.auth, config.redirectUri, config.clientId),
       passwordsApi: new PasswordsApi(config.backend)
     };
   }, [config]);

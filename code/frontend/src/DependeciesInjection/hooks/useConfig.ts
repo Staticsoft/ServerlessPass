@@ -5,8 +5,10 @@ import { Config } from '../types';
 
 export const useConfig = () => {
   const [config, setConfig] = useState<Config>({
+    redirectUri: '',
+    backend: '',
     auth: '',
-    backend: ''
+    clientId: '',
   });
   const [loadingConfig, setLoading] = useState(true);
 
