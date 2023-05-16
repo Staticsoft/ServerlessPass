@@ -37,9 +37,7 @@ export class Authenticator {
   }
 
   autoSignIn = async () => {
-    const token = getTokenFromStorage() ?? getCodeFromUrl();
-
-    return token;
+    return getTokenFromStorage();
   };
 
   signIn = async () => {
