@@ -1,38 +1,46 @@
+import { AuthApi } from './AuthApi';
 import {
   getTokenFromStorage,
-  getTokenFromUrl,
+  getCodeFromUrl,
   putTokenToStorage,
   removeTokenFromStorage,
   redirectToAuthPage
 } from './tools';
 
 export class Authenticator {
-  constructor(private authUrl: string) {}
+  constructor(private authUrl: string, private redirectUri: string, private api: AuthApi) {}
 
-  getToken = () => {
-    let token = getTokenFromStorage();
+  getStoredToken = (): Promise<string | null> => {
+    return this.getToken();
+  };
+
+  signIn = async (): Promise<string | null> => {
+    const token = await this.getToken();
 
     if (!token) {
-      token = getTokenFromUrl();
-      if (token) putTokenToStorage(token);
+      redirectToAuthPage(this.authUrl, this.redirectUri);
+      return null;
     }
 
     return token;
   };
 
-  autoSignIn = async () => {
-    const token = getTokenFromStorage() ?? getTokenFromUrl();
+  signOut = (): void => removeTokenFromStorage();
+
+  private getToken = async (): Promise<string | null> => {
+    let token = getTokenFromStorage();
+    if (token) return token;
+
+    token = await this.getTokenFromCode();
+    if (token) putTokenToStorage(token);
 
     return token;
   };
 
-  signIn = async () => {
-    const token = this.getToken();
+  private getTokenFromCode = async (): Promise<string | null> => {
+    const code = getCodeFromUrl();
+    if (!code) return null;
 
-    if (!token) redirectToAuthPage(this.authUrl);
-
-    return token;
+    return this.api.exchangeCode(code);
   };
-
-  signOut = async () => removeTokenFromStorage();
 }
