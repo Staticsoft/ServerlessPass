@@ -1,3 +1,4 @@
+import { AuthApi } from './AuthApi';
 import {
   getTokenFromStorage,
   getCodeFromUrl,
@@ -7,46 +8,39 @@ import {
 } from './tools';
 
 export class Authenticator {
-  constructor(private authUrl: string, private redirectUri: string, private clientId: string) {}
+  constructor(private authUrl: string, private redirectUri: string, private api: AuthApi) {}
 
-  getToken = async () => {
-    let token = getTokenFromStorage();
+  getStoredToken = (): Promise<string | null> => {
+    return this.getToken();
+  };
+
+  signIn = async (): Promise<string | null> => {
+    const token = await this.getToken();
 
     if (!token) {
-      const code = getCodeFromUrl();
-      token = await this.exchangeCode(code);
-      if (token) putTokenToStorage(token);
+      redirectToAuthPage(this.authUrl, this.redirectUri);
+      return null;
     }
 
     return token;
   };
 
-  exchangeCode = async (code: string | null) : Promise<string | null> => {
-    if (!code) return null;
+  signOut = (): void => removeTokenFromStorage();
 
-    const body = `grant_type=authorization_code&client_id=${this.clientId}&code=${code}&redirect_uri=${this.redirectUri}`;
-    const response = await fetch(`${this.authUrl}/oauth2/token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-      },
-      body
-    });
-    const responseBody = await response.json();
-    return responseBody.id_token;
-  }
+  private getToken = async (): Promise<string | null> => {
+    let token = getTokenFromStorage();
+    if (token) return token;
 
-  autoSignIn = async () => {
-    return getTokenFromStorage();
-  };
-
-  signIn = async () => {
-    const token = await this.getToken();
-
-    if (!token) redirectToAuthPage(this.authUrl, this.redirectUri);
+    token = await this.getTokenFromCode();
+    if (token) putTokenToStorage(token);
 
     return token;
   };
 
-  signOut = async () => removeTokenFromStorage();
+  private getTokenFromCode = async (): Promise<string | null> => {
+    const code = getCodeFromUrl();
+    if (!code) return null;
+
+    return this.api.exchangeCode(code);
+  };
 }

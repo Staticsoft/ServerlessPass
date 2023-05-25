@@ -8,7 +8,7 @@ export const useConfig = () => {
     redirectUri: '',
     backend: '',
     auth: '',
-    clientId: '',
+    clientId: ''
   });
   const [loadingConfig, setLoading] = useState(true);
 
