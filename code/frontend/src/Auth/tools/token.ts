@@ -1,4 +1,4 @@
-export function getTokenFromUrl(): string | null {
+export function getCodeFromUrl(): string | null {
   const urlParams = new URLSearchParams(window.location.search);
 
   return urlParams.get('code');

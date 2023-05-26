@@ -1,0 +1,6 @@
+{
+    "redirectUri": "http://localhost:5000",
+    "backend": "http://localhost:5001",
+    "auth": "http://localhost:5002",
+    "clientId": "fake"
+}

@@ -15,17 +15,32 @@ export interface ApiPasswordsData {
 }
 
 export class PasswordsApi {
+  private passwordsUrl: string;
+
+  constructor(backendUrl: string) {
+    this.passwordsUrl = backendUrl + '/passwords';
+  }
+
   getPasswordsList = async (token?: string | null): Promise<ApiPasswordsData[]> => {
     if (!token) return [];
 
-    const response = await fetch('http://localhost:5001/passwords', {
+    const response = await fetch(this.passwordsUrl, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     });
 
     const passwords = await response.json();
+
     return passwords.results as ApiPasswordsData[];
   };
-}
 
-export const passwordsApi = new PasswordsApi();
+  importPasswords = async (token?: string | null, passwordsJSON?: string): Promise<void> => {
+    if (!token || !passwordsJSON) return;
+
+    await fetch(this.passwordsUrl, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: passwordsJSON
+    });
+  };
+}

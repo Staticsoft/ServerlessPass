@@ -17,22 +17,25 @@ export function AuthProvider({ authenticator, children }: AuthProviderProps) {
 
   useEffect(() => {
     (async () => {
-      const newToken = await authenticator.getToken();
+      const storedToken = await authenticator.getStoredToken();
+      if (!storedToken) return;
 
-      setToken(newToken);
-      setLogedIn(Boolean(setToken));
+      setToken(storedToken);
+      setLogedIn(Boolean(storedToken));
 
-      if (newToken) navigate('/passwords');
+      navigate('/passwords');
     })();
   }, []);
 
   const signIn = async () => {
     const newToken = await authenticator.signIn();
 
-    setToken(newToken);
-    setLogedIn(Boolean(setToken));
+    if (newToken) {
+      setToken(newToken);
+      setLogedIn(Boolean(newToken));
 
-    if (newToken) navigate('/passwords');
+      navigate('/passwords');
+    }
   };
 
   const signOut = async () => {
