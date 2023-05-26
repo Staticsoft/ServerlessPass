@@ -27,7 +27,7 @@
   </ItemGroup>
     
   <ItemGroup>
-    <PackageReference Include="Staticsoft.Contracts.ASP.Client" Version="1.0.0-16" />
+    <PackageReference Include="Staticsoft.Contracts.ASP.Client" Version="1.0.0-17" />
     <PackageReference Include="Staticsoft.Testing.Integration" Version="1.0.0-10" />
     <PackageReference Include="Staticsoft.Testing.Unit" Version="1.0.0-10" />
     <PackageReference Include="Staticsoft.HttpCommunication.Json" Version="1.0.0-7" />
