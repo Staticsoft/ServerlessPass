@@ -27,7 +27,10 @@ public class LambdaEntryPoint : APIGatewayProxyFunction
     static void SetAuthenticationContext(InvokeFeatures features, APIGatewayProxyRequest apiGatewayRequest)
     {
         var claims = apiGatewayRequest.RequestContext.Authorizer?.Claims;
-        if (claims != null) features.Set(new Claims(claims));
+        if (claims != null)
+        {
+            features.Set(new Claims(claims));
+        }
     }
 
     static void HandleCloudWatchRequest(APIGatewayProxyRequest request)

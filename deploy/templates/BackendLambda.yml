@@ -59,12 +59,14 @@ Resources:
     - OptionsMethod
     - PostAuthJwtCreateMethod
     - PostAuthJwtRefreshMethod
+    - GetAuthUsersMeMethod
     - PostPasswordsListMethod
     - PostPasswordsCreateMethod
     - PostPasswordsImportMethod
     - PostPasswordsUpdateIdMethod
     - PostPasswordsDeleteIdMethod
     - GetPasswordsMethod
+    - GetPasswordsIdMethod
     - PostPasswordsMethod
     - PutPasswordsMethod
     - PutPasswordsIdMethod
@@ -115,6 +117,13 @@ Resources:
         Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
       ParentId: !Ref AuthResource
       PathPart: users
+  AuthUsersMeResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId:
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ParentId: !Ref AuthUsersResource
+      PathPart: me
   AuthJwtResource:
     Type: AWS::ApiGateway::Resource
     Properties:
@@ -283,6 +292,20 @@ Resources:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
         Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations"
+  GetAuthUsersMeMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId:
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ResourceId: !Ref AuthUsersMeResource
+      HttpMethod: GET
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId:
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}AuthorizerId"
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations"
   PostPasswordsListMethod:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -290,6 +313,20 @@ Resources:
         Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
       ResourceId: !Ref PasswordsListResource
       HttpMethod: POST
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId:
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}AuthorizerId"
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations"
+  GetPasswordsIdMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId:
+        Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
+      ResourceId: !Ref PasswordsIdResource
+      HttpMethod: GET
       AuthorizationType: COGNITO_USER_POOLS
       AuthorizerId:
         Fn::ImportValue: !Sub "ServerlessPass${Stage}AuthorizerId"

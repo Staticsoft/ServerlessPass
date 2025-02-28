@@ -1,31 +1,35 @@
-﻿using Staticsoft.PartitionedStorage.Abstractions;
-
-namespace Staticsoft.ServerlessPass.Server;
+﻿namespace Staticsoft.ServerlessPass.Server;
 
 public class ListPasswordsEndpoint : HttpEndpoint<EmptyRequest, PasswordProfiles>
 {
-    readonly ProfilesDocuments Documents;
+    readonly PasswordProfileRepository Profiles;
+    readonly IHttpContextAccessor Accessor;
 
-    public ListPasswordsEndpoint(ProfilesDocuments documents)
-        => Documents = documents;
+    public ListPasswordsEndpoint(PasswordProfileRepository profiles, IHttpContextAccessor accessor)
+        => (Profiles, Accessor) = (profiles, accessor);
+
+    HttpContext Context
+        => Accessor.HttpContext ?? throw new InvalidOperationException($"{nameof(Accessor.HttpContext)} is null");
 
     public async Task<PasswordProfiles> Execute(EmptyRequest request)
     {
-        var documents = await Documents.Scan();
-        var profiles = CombineDocumentsProfiles(documents);
-        return new() { results = profiles };
+        var profiles = await Profiles.Scan();
+        if (!Context.Request.Query.TryGetValue("search", out var values))
+        {
+            return new() { results = profiles };
+        }
+
+        var site = values.Single();
+        var matchingProfiles = profiles
+            .Where(profile => IsSameSite(profile, site))
+            .OrderBy(profile => LengthDifference(profile, site))
+            .ToArray();
+        return new() { results = matchingProfiles };
     }
 
-    static PasswordProfile[] CombineDocumentsProfiles(Item<PasswordProfilesDocument>[] documents)
-    {
-        var profilesCount = documents.Sum(document => document.Data.Profiles.Length);
-        var profiles = new PasswordProfile[profilesCount];
-        var copied = 0;
-        foreach (var document in documents)
-        {
-            Array.Copy(document.Data.Profiles, 0, profiles, copied, document.Data.Profiles.Length);
-            copied += document.Data.Profiles.Length;
-        }
-        return profiles;
-    }
+    static bool IsSameSite(PasswordProfile profile, string site)
+        => site.EndsWith(profile.site);
+
+    static int LengthDifference(PasswordProfile profile, string site)
+        => Math.Abs(profile.site.Length - site.Length);
 }

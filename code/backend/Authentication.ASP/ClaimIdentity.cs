@@ -12,6 +12,9 @@ public class ClaimIdentity : Identity
     public string UserId
         => Context.Features.Get<Claims>().Get("sub");
 
+    public string Email
+        => Context.Features.Get<Claims>().Get("email");
+
     HttpContext Context
         => Accessor.HttpContext ?? throw UnexpectedNullException(nameof(Context));
 
