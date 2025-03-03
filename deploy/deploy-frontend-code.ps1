@@ -13,6 +13,10 @@ function Publish-Code {
     )
 }
 
+function New-Config {
+    Copy-Item "$Local/deploy/FrontendConfig.json" "$Local/Frontend/config.json"
+}
+
 function Deploy-Code {
     $bucketName = Get-ExportValue -Name "ServerlessPass${Stage}FrontendArtifactsBucketName"
 
@@ -67,5 +71,6 @@ function Get-ExportValue {
 }
 
 Publish-Code
+New-Config
 Deploy-Code
 Update-Cache

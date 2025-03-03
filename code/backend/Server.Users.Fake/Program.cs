@@ -6,10 +6,11 @@ var app = builder.Build();
 
 app.Use(Cors);
 
-app.MapGet("/login", (string redirect_uri, string response_type, string scope) =>
+app.MapGet("/login", (string redirect_uri, string response_type, string scope, string client_id) =>
 {
     if (response_type != "code") return InvalidResponseType();
     if (scope != "openid") return InvalidScope();
+    if (client_id != "fake") return InvalidClientId();
 
     var page = $@"
 <html>
