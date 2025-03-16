@@ -3,5 +3,9 @@
 	<PropertyGroup>
 		<Company>Staticsoft</Company>
 		<Product>ServerlessPass</Product>
+        <TargetFramework>net8.0</TargetFramework>
+        <RootNamespace>$(Company).$(Product).$(MSBuildProjectName)</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
 	</PropertyGroup>
 </Project>

@@ -22,7 +22,7 @@ public class PasswordsTests : PasswordScenarioBase
             login = "test@mail.com",
             uppercase = true,
             lowercase = true,
-            numbers = true,
+            digits = true,
             symbols = true,
             length = 16,
             counter = 1,
@@ -35,7 +35,7 @@ public class PasswordsTests : PasswordScenarioBase
         Assert.Equal("test@mail.com", profile.login);
         Assert.True(profile.uppercase);
         Assert.True(profile.lowercase);
-        Assert.True(profile.numbers);
+        Assert.True(profile.digits);
         Assert.True(profile.symbols);
         Assert.Equal(16, profile.length);
         Assert.Equal(1, profile.counter);
@@ -51,7 +51,7 @@ public class PasswordsTests : PasswordScenarioBase
             login = "test@mail.com",
             uppercase = true,
             lowercase = true,
-            numbers = true,
+            digits = true,
             symbols = true,
             length = 16,
             counter = 1,
@@ -72,7 +72,7 @@ public class PasswordsTests : PasswordScenarioBase
             login = "test@mail.com",
             uppercase = true,
             lowercase = true,
-            numbers = true,
+            digits = true,
             symbols = true,
             length = 16,
             counter = 1,
@@ -85,7 +85,7 @@ public class PasswordsTests : PasswordScenarioBase
         Assert.Equal("test@mail.com", profile.login);
         Assert.True(profile.uppercase);
         Assert.True(profile.lowercase);
-        Assert.True(profile.numbers);
+        Assert.True(profile.digits);
         Assert.True(profile.symbols);
         Assert.Equal(16, profile.length);
         Assert.Equal(1, profile.counter);
@@ -102,7 +102,7 @@ public class PasswordsTests : PasswordScenarioBase
             login = "test@mail.com",
             uppercase = true,
             lowercase = true,
-            numbers = true,
+            digits = true,
             symbols = true,
             length = 16,
             counter = 1,
@@ -132,7 +132,7 @@ public class PasswordsTests : PasswordScenarioBase
             login = "test@mail.com",
             uppercase = true,
             lowercase = true,
-            numbers = true,
+            digits = true,
             symbols = true,
             length = 16,
             counter = 1,
@@ -152,7 +152,7 @@ public class PasswordsTests : PasswordScenarioBase
             login = "test@mail.com",
             uppercase = true,
             lowercase = true,
-            numbers = true,
+            digits = true,
             symbols = true,
             length = 16,
             counter = 1,

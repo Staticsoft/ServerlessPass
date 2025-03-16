@@ -65,7 +65,7 @@ public class CreatePasswordEndpoint : HttpEndpoint<CreatePasswordRequest, Passwo
             login = request.login,
             uppercase = request.uppercase,
             lowercase = request.lowercase,
-            numbers = request.numbers,
+            digits = request.digits,
             symbols = request.symbols,
             length = request.length,
             counter = request.counter,

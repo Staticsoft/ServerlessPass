@@ -52,16 +52,16 @@ app.Run();
 
 static LoginRequest ToLoginRequest(IFormCollection form) => new()
 {
-    redirect_uri = form["redirect_uri"],
-    user = form["user"]
+    redirect_uri = form["redirect_uri"]!,
+    user = form["user"]!
 };
 
 static AuthenticationRequest ToAuthenticationRequest(IFormCollection form) => new()
 {
-    client_id = form["client_id"],
-    code = form["code"],
-    grant_type = form["grant_type"],
-    redirect_uri = form["redirect_uri"]
+    client_id = form["client_id"]!,
+    code = form["code"]!,
+    grant_type = form["grant_type"]!,
+    redirect_uri = form["redirect_uri"]!
 };
 
 static IResult InvalidResponseType()

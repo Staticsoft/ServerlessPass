@@ -19,7 +19,7 @@ public class ListPasswordsEndpoint : HttpEndpoint<EmptyRequest, PasswordProfiles
             return new() { results = profiles };
         }
 
-        var site = values.Single();
+        var site = values.Single()!;
         var matchingProfiles = profiles
             .Where(profile => IsSameSite(profile, site))
             .OrderBy(profile => LengthDifference(profile, site))

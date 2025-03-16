@@ -1,19 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <RootNamespace>$(Company).$(Product).$(MSBuildProjectName)</RootNamespace>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Services\Services.csproj" />
-    <ProjectReference Include="..\Users\Users.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Services\Services.csproj" />
+        <ProjectReference Include="..\Users\Users.csproj" />
+    </ItemGroup>
     
-  <ItemGroup>
-    <PackageReference Include="AWSSDK.CognitoIdentityProvider" Version="3.7.101.80" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="AWSSDK.CognitoIdentityProvider" Version="3.7.101.80" />
+    </ItemGroup>
 
 </Project>

@@ -1,18 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-      <Nullable>enable</Nullable>
-      <ImplicitUsings>enable</ImplicitUsings>
-      <RootNamespace>$(Company).$(Product).$(MSBuildProjectName)</RootNamespace>
-  </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Authentication.Fakes\Authentication.Fakes.csproj" />
-    <ProjectReference Include="..\Server\Server.csproj" />
-    <ProjectReference Include="..\Users.Fakes\Users.Fakes.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Authentication.Fakes\Authentication.Fakes.csproj" />
+        <ProjectReference Include="..\Server\Server.csproj" />
+        <ProjectReference Include="..\Users.Fakes\Users.Fakes.csproj" />
+    </ItemGroup>
     
-  <ItemGroup>
-    <PackageReference Include="Staticsoft.PartitionedStorage.Memory" Version="1.0.0-7" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Staticsoft.PartitionedStorage.Memory" Version="1.0.0-10" />
+    </ItemGroup>
 </Project>
