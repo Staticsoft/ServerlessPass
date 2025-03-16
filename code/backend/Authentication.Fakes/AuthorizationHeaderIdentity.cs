@@ -12,6 +12,9 @@ public class AuthorizationHeaderIdentity : Identity
     public string UserId
         => GetUserId();
 
+    public string Email
+        => throw new NotImplementedException();
+
     string GetUserId()
     {
         var value = Context.Request.Headers["Authorization"].Single();

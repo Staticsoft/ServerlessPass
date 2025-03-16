@@ -7,6 +7,7 @@ public class Passwords
 {
     public Passwords(
         HttpEndpoint<EmptyRequest, PasswordProfiles> list,
+        ParametrizedHttpEndpoint<EmptyRequest, PasswordProfile> get,
         HttpEndpoint<CreatePasswordRequest, PasswordProfile> create,
         HttpEndpoint<PasswordProfiles, PasswordProfiles> import,
         ParametrizedHttpEndpoint<UpdatePasswordRequest, PasswordProfile> update,
@@ -14,11 +15,14 @@ public class Passwords
         ParametrizedHttpEndpoint<UpdatePasswordRequestProxy, PasswordProfile> updateProxy,
         ParametrizedHttpEndpoint<EmptyRequestProxy, DeletePasswordResponse> deleteProxy
     )
-        => (List, Create, Import, Update, Delete, UpdateProxy, DeleteProxy)
-        = (list, create, import, update, delete, updateProxy, deleteProxy);
+        => (List, Get, Create, Import, Update, Delete, UpdateProxy, DeleteProxy)
+        = (list, get, create, import, update, delete, updateProxy, deleteProxy);
 
     [Endpoint(HttpMethod.Post)]
     public HttpEndpoint<EmptyRequest, PasswordProfiles> List { get; }
+
+    [Endpoint(HttpMethod.Get, pattern: "{parameter}")]
+    public ParametrizedHttpEndpoint<EmptyRequest, PasswordProfile> Get { get; }
 
     [Endpoint(HttpMethod.Post)]
     [EndpointBehavior(statusCode: 201)]

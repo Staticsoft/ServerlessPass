@@ -29,6 +29,7 @@ public abstract class Startup
         .AddSingleton<ItemSerializer, JsonItemSerializer>()
         .AddScoped<ServiceStatus, StorageStatus>()
         .AddScoped(AddUserProfiles)
+        .AddScoped<PasswordProfileRepository>()
         .AddSingleton<PasswordProfilesIdGenerator>();
 
     static ProfilesDocuments AddUserProfiles(IServiceProvider services)

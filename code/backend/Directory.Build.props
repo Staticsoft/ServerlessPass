@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<PropertyGroup>
-		<Company>Staticsoft</Company>
-		<Product>ServerlessPass</Product>
-	</PropertyGroup>
+    <PropertyGroup>
+        <Company>Staticsoft</Company>
+        <Product>ServerlessPass</Product>
+        <TargetFramework>net8.0</TargetFramework>
+        <RootNamespace>$(Company).$(Product).$(MSBuildProjectName)</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 </Project>

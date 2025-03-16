@@ -1,13 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <RootNamespace>$(Company).$(Product).$(MSBuildProjectName)</RootNamespace>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Staticsoft.Contracts.Abstractions" Version="1.0.0-17" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Staticsoft.Contracts.Abstractions" Version="1.0.0-17" />
+    </ItemGroup>
 
 </Project>
