@@ -33,43 +33,17 @@ Resources:
       - DomainName: !Ref DomainName
         HostedZoneId: !Ref DomainHostedZoneId
       ValidationMethod: DNS
-  UserPool:
-    Type: AWS::Cognito::UserPool
-    Properties:
-      AccountRecoverySetting:
-        RecoveryMechanisms:
-        - Name: verified_email
-          Priority: 1
-      AutoVerifiedAttributes:
-      - email
-      Policies:
-        PasswordPolicy:
-          MinimumLength: 8
-          RequireLowercase: true
-          RequireNumbers: true
-          RequireSymbols: true
-          RequireUppercase: true
-          TemporaryPasswordValidityDays: 1
-      UsernameAttributes:
-      - email
-      UsernameConfiguration:
-        CaseSensitive: false
-      UserPoolName: !Sub "${Alias.Value}Users"
-      VerificationMessageTemplate:
-        DefaultEmailOption: CONFIRM_WITH_LINK
-        EmailMessageByLink: Please click the link below to verify your email address.
-          {##Verify email##}
-        EmailSubjectByLink: Email verification is required
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
-      ClientName: BackendUserPoolClient
+      ClientName: ServerlessPassBackendClient
       ExplicitAuthFlows:
       - ALLOW_REFRESH_TOKEN_AUTH
       - ALLOW_USER_PASSWORD_AUTH
       SupportedIdentityProviders:
       - COGNITO
-      UserPoolId: !Ref UserPool
+      UserPoolId:
+        Fn::ImportValue: !Sub "StaticsoftExternalUsers${Stage}UserPoolId"
       TokenValidityUnits:
         AccessToken: days
         IdToken: days
@@ -119,7 +93,8 @@ Resources:
           Action:
           - cognito-idp:AdminInitiateAuth
           - cognito-idp:ListUsers
-          Resource: !GetAtt UserPool.Arn
+          Resource:
+            Fn::ImportValue: !Sub "StaticsoftExternalUsers${Stage}UserPoolArn"
   LambdaFunctionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -285,7 +260,7 @@ Resources:
       RestApiId: !Ref ApiGateway
       Type: COGNITO_USER_POOLS
       ProviderARNs:
-      - !Sub "arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${UserPool}"
+      - Fn::ImportValue: !Sub "StaticsoftExternalUsers${Stage}UserPoolArn"
       IdentitySource: method.request.header.Authorization
       AuthorizerResultTtlInSeconds: 3600
   ApiGatewayDomain:
@@ -312,10 +287,6 @@ Outputs:
     Value: !GetAtt LambdaFunctionRole.Arn
     Export:
       Name: !Sub "ServerlessPass${Stage}LambdaFunctionRoleArn"
-  UserPoolId:
-    Value: !Ref UserPool
-    Export:
-      Name: !Sub "ServerlessPass${Stage}UserPoolId"
   UserPoolClientId:
     Value: !Ref UserPoolClient
     Export:

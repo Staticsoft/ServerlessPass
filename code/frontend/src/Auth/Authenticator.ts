@@ -8,7 +8,7 @@ import {
 } from './tools';
 
 export class Authenticator {
-  constructor(private authUrl: string, private redirectUri: string, private api: AuthApi) {}
+  constructor(private authUrl: string, private redirectUri: string, private clientId: string, private api: AuthApi) {}
 
   getStoredToken = (): Promise<string | null> => {
     return this.getToken();
@@ -18,7 +18,7 @@ export class Authenticator {
     const token = await this.getToken();
 
     if (!token) {
-      redirectToAuthPage(this.authUrl, this.redirectUri);
+      redirectToAuthPage(this.authUrl, this.redirectUri, this.clientId);
       return null;
     }
 

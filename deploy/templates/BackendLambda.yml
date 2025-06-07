@@ -20,7 +20,7 @@ Resources:
           CognitoClientAppId:
             Fn::ImportValue: !Sub "ServerlessPass${Stage}UserPoolClientId"
           CognitoUserPoolId:
-            Fn::ImportValue: !Sub "ServerlessPass${Stage}UserPoolId"
+            Fn::ImportValue: !Sub "StaticsoftExternalUsers${Stage}UserPoolId"
           DynamoDbTableNamePrefix: !Sub "ServerlessPass${Stage}"
           CrossOriginDomains:
             Fn::ImportValue: !Sub "ServerlessPass${Stage}CrossOriginDomains"
