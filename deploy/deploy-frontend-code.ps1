@@ -5,12 +5,13 @@ param(
 $Local = "$PSScriptRoot/../.local"
 
 function Publish-Code {
-    & npm @(
-        'run'
-        '--prefix'
-        "${PSScriptRoot}/../code/frontend"
-        'build'
-    )
+    Push-Location "${PSScriptRoot}/../code/frontend"
+
+    npm run build
+
+    Pop-Location
+
+    Copy-Item "$Local/deploy/FrontendConfig${Stage}.json" -Destination "$Local/Frontend/config.json"
 }
 
 function Deploy-Code {
@@ -21,6 +22,7 @@ function Deploy-Code {
         'sync'
         "$Local/Frontend"
         "s3://$bucketName"
+        '--delete'
     )
 }
 
