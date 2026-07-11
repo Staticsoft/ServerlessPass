@@ -40,7 +40,7 @@ function Get-ExportValue {
         'cloudformation'
         'list-exports'
         '--query'
-        "(Exports[?Name=='$name'].Value)[0]"
+        "(Exports[?Name=='$name'].Value)"
         '--output'
         'text'
     )

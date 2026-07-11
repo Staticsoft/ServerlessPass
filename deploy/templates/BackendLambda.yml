@@ -15,6 +15,8 @@ Resources:
         Fn::ImportValue: !Sub "ServerlessPass${Stage}LambdaFunctionRoleArn"
       Timeout: 30
       Runtime: dotnet8
+      SnapStart:
+        ApplyOn: "PublishedVersions"
       Environment:
         Variables:
           CognitoClientAppId:
@@ -35,24 +37,6 @@ Resources:
         - arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiId}/*/*/*
         - ApiId:
             Fn::ImportValue: !Sub "ServerlessPass${Stage}ApiGatewayId"
-  LambdaCloudWatchPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      Principal: events.amazonaws.com
-      FunctionName: !Ref LambdaFunction
-      SourceArn: !GetAtt StatusTrigger.Arn
-  StatusTrigger:
-    Type: AWS::Events::Rule
-    Properties:
-      Description: "Checks lambda's status every minute"
-      Name: !Sub "ServerlessPass${Stage}StatusRule"
-      ScheduleExpression: "rate(1 minute)"
-      State: "ENABLED"
-      Targets:
-      - Id: TriggerEveryMinute
-        Arn: !GetAtt LambdaFunction.Arn
-        Input: '{"RequestContext":{"EventType":"CloudWatchTrigger","ResourcePath":"/Administrative/Status"}}'
   ApiGatewayDeployment:
     Type: AWS::ApiGateway::Deployment
     DependsOn:
