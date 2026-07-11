@@ -224,17 +224,6 @@ Resources:
           - !Sub "arn:aws:apigateway:${AWS::Region}::/restapis/${ApiGateway}/*"
           - !Sub "arn:aws:apigateway:${AWS::Region}::/domainnames/${ApiGatewayDomain}/basepathmappings"
           - !Sub "arn:aws:apigateway:${AWS::Region}::/domainnames/${ApiGatewayDomain}/basepathmappings/*"
-        - Effect: Allow
-          Action:
-          - events:DescribeRule
-          - events:PutRule
-          - events:DeleteRule
-          - events:EnableRule
-          - events:DisableRule
-          - events:PutTargets
-          - events:RemoveTargets
-          Resource:
-            Fn::Sub: "arn:aws:events:${AWS::Region}:${AWS::AccountId}:rule/${Alias.Value}StatusRule"
   CodeBuildRole:
     Type: AWS::IAM::Role
     Properties:

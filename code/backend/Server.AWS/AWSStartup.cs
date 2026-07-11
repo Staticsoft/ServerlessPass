@@ -7,7 +7,6 @@ using Staticsoft.PartitionedStorage.Abstractions;
 using Staticsoft.PartitionedStorage.AWS;
 using Staticsoft.ServerlessPass.Authentication;
 using Staticsoft.ServerlessPass.Authentication.ASP;
-using Staticsoft.ServerlessPass.Services;
 using Staticsoft.ServerlessPass.Users;
 using Staticsoft.ServerlessPass.Users.Cognito;
 using System;
@@ -26,7 +25,6 @@ public class AWSStartup : Startup
         .AddSingleton<AmazonDynamoDBClient>()
         .AddScoped<CognitoUser>()
         .AddScoped<User>(provider => provider.GetRequiredService<CognitoUser>())
-        .AddScoped<ServiceStatus>(provider => provider.GetRequiredService<CognitoUser>())
         .AddSingleton(CognitoOptions())
         .AddSingleton<AmazonCognitoIdentityProviderClient>()
         .AddScoped<Identity, ClaimIdentity>();

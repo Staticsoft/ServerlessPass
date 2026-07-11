@@ -8,17 +8,15 @@ public class Schema
     public Schema(
         Auth auth,
         Passwords passwords,
-        Administrative administrative,
         HttpEndpoint<EmptyRequestProxy, PasswordProfiles> listProxy,
         HttpEndpoint<CreatePasswordRequestProxy, PasswordProfile> createProxy,
         HttpEndpoint<PasswordProfilesProxy, PasswordProfiles> importProxy
     )
-        => (Auth, Passwords, Administrative, ListProxy, CreateProxy, ImportProxy)
-        = (auth, passwords, administrative, listProxy, createProxy, importProxy);
+        => (Auth, Passwords, ListProxy, CreateProxy, ImportProxy)
+        = (auth, passwords, listProxy, createProxy, importProxy);
 
     public Auth Auth { get; }
     public Passwords Passwords { get; }
-    public Administrative Administrative { get; }
 
     [Endpoint(HttpMethod.Get, pattern: "passwords")]
     public HttpEndpoint<EmptyRequestProxy, PasswordProfiles> ListProxy { get; }

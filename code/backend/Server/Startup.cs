@@ -2,7 +2,6 @@ using Staticsoft.Contracts.ASP.Server;
 using Staticsoft.PartitionedStorage.Abstractions;
 using Staticsoft.Serialization.Net;
 using Staticsoft.ServerlessPass.Authentication;
-using Staticsoft.ServerlessPass.Services;
 using System.Reflection;
 
 namespace Staticsoft.ServerlessPass.Server;
@@ -27,7 +26,6 @@ public abstract class Startup
         .AddHttpContextAccessor()
         .UseSystemJsonSerializer()
         .AddSingleton<ItemSerializer, JsonItemSerializer>()
-        .AddScoped<ServiceStatus, StorageStatus>()
         .AddScoped(AddUserProfiles)
         .AddScoped<PasswordProfileRepository>()
         .AddSingleton<PasswordProfilesIdGenerator>();
